@@ -1,5 +1,6 @@
 import { Mail, MessageCircle } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
+import SectionKicker from "./SectionKicker";
 import { siteConfig } from "@/lib/site-config";
 
 export default function CTA() {
@@ -10,9 +11,7 @@ export default function CTA() {
           <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-brand-600/25 blur-[90px]" />
           <div className="pointer-events-none absolute -right-10 -bottom-10 h-56 w-56 rounded-full bg-brand-600/20 blur-[90px]" />
 
-          <p className="relative mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-400">
-            Hablemos
-          </p>
+          <SectionKicker className="relative mb-3">Hablemos</SectionKicker>
           <h2 className="relative font-display mx-auto max-w-xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             ¿Tienes un proyecto en mente?
           </h2>

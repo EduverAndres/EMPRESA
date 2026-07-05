@@ -1,5 +1,6 @@
 import { Search, Layers, Repeat, LifeBuoy } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
+import SectionKicker from "./SectionKicker";
 
 const steps = [
   {
@@ -33,9 +34,7 @@ export default function Process() {
     <section className="relative px-5 py-24 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-6xl">
         <ScrollReveal className="mx-auto max-w-2xl text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-400">
-            Cómo trabajamos
-          </p>
+          <SectionKicker className="mb-3">Cómo trabajamos</SectionKicker>
           <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Un proceso claro, de principio a fin
           </h2>

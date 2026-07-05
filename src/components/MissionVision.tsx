@@ -1,15 +1,14 @@
 import { Rocket, Telescope } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
 import TiltCard from "./TiltCard";
+import SectionKicker from "./SectionKicker";
 
 export default function MissionVision() {
   return (
     <section id="mision-vision" className="relative px-5 py-24 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-6xl">
         <ScrollReveal className="mx-auto max-w-2xl text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-400">
-            Nuestro rumbo
-          </p>
+          <SectionKicker className="mb-3">Nuestro rumbo</SectionKicker>
           <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Un rumbo claro detrás de cada línea de código
           </h2>

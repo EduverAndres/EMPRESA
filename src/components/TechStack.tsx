@@ -1,4 +1,5 @@
 import ScrollReveal from "./ScrollReveal";
+import SectionKicker from "./SectionKicker";
 
 const rowA = [
   "Frontend moderno",
@@ -43,9 +44,7 @@ export default function TechStack() {
     <section className="relative py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <ScrollReveal className="mx-auto max-w-2xl text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-400">
-            Capacidades
-          </p>
+          <SectionKicker className="mb-3">Capacidades</SectionKicker>
           <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Elegimos la herramienta correcta, no la única que sabemos usar
           </h2>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import Logo from "./Logo";
 import { siteConfig } from "@/lib/site-config";
 
 export default function Navbar() {
@@ -33,14 +34,15 @@ export default function Navbar() {
       }`}
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
-        <Link href="/#inicio" className="flex items-center gap-2 group">
-          <span className="relative flex h-8 w-8 items-center justify-center">
-            <span className="absolute inset-0 rounded-full bg-brand-600/30 blur-md transition-opacity group-hover:opacity-100" />
-            <span className="relative h-3 w-3 rounded-full bg-brand-500 shadow-[0_0_18px_rgba(255,50,69,0.9)]" />
-            <span className="absolute h-6 w-6 rounded-full border border-brand-500/40 animate-spin-slow" />
-          </span>
-          <span className="font-display text-lg font-semibold tracking-tight text-white">
-            {siteConfig.name}
+        <Link href="/#inicio" className="flex items-center gap-2.5 group">
+          <Logo size={32} className="transition-transform group-hover:scale-105" />
+          <span className="flex flex-col leading-none">
+            <span className="font-display text-lg font-semibold tracking-tight text-white">
+              {siteConfig.name}
+            </span>
+            <span className="hidden font-mono text-[10px] tracking-wide text-neutral-500 sm:block">
+              {siteConfig.tagline}
+            </span>
           </span>
         </Link>
 

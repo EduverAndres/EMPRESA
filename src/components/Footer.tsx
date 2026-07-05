@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Mail, MessageCircle } from "lucide-react";
 import { FacebookIcon, InstagramIcon, LinkedinIcon } from "./icons/BrandIcons";
+import Logo from "./Logo";
+import SectionKicker from "./SectionKicker";
 import { siteConfig } from "@/lib/site-config";
 
 const socialLinks = [
@@ -17,17 +19,16 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <Link href="/#inicio" className="flex items-center gap-2">
-              <span className="relative flex h-8 w-8 items-center justify-center">
-                <span className="absolute inset-0 rounded-full bg-brand-600/30 blur-md" />
-                <span className="relative h-3 w-3 rounded-full bg-brand-500 shadow-[0_0_18px_rgba(255,50,69,0.9)]" />
-                <span className="absolute h-6 w-6 rounded-full border border-brand-500/40 animate-spin-slow" />
-              </span>
+            <Link href="/#inicio" className="flex items-center gap-2.5">
+              <Logo size={32} />
               <span className="font-display text-lg font-semibold tracking-tight text-white">
                 {siteConfig.name}
               </span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-400">
+            <p className="mt-3 font-mono text-xs tracking-wide text-brand-400">
+              {siteConfig.tagline}
+            </p>
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-neutral-400">
               {siteConfig.description}
             </p>
 
@@ -48,9 +49,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
-              Navegación
-            </p>
+            <SectionKicker tone="muted">Navegación</SectionKicker>
             <div className="mt-5 flex flex-col gap-3">
               {siteConfig.nav.map((item) => (
                 <Link
@@ -65,9 +64,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
-              Contacto
-            </p>
+            <SectionKicker tone="muted">Contacto</SectionKicker>
             <div className="mt-5 flex flex-col gap-3 text-sm text-neutral-400">
               <a
                 href={`mailto:${siteConfig.email}`}

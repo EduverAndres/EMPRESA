@@ -2,15 +2,14 @@ import ScrollReveal from "./ScrollReveal";
 import TiltCard from "./TiltCard";
 import BrowserIcon3D from "./icons3d/BrowserIcon3D";
 import BarChartIcon3D from "./icons3d/BarChartIcon3D";
+import SectionKicker from "./SectionKicker";
 
 export default function Pillars() {
   return (
     <section className="relative px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <ScrollReveal className="mx-auto max-w-2xl text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-400">
-            Lo que hacemos
-          </p>
+          <SectionKicker className="mb-3">Lo que hacemos</SectionKicker>
           <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Dos disciplinas, un mismo equipo
           </h2>

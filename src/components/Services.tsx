@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
 import ServiceIcon3D from "./ServiceIcon3D";
+import SectionKicker from "./SectionKicker";
 import { services } from "@/lib/services";
 
 export default function Services() {
@@ -9,9 +10,7 @@ export default function Services() {
     <section id="servicios" className="relative px-5 py-24 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-6xl">
         <ScrollReveal className="mx-auto max-w-2xl text-center">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-400">
-            Qué hacemos
-          </p>
+          <SectionKicker className="mb-3">Qué hacemos</SectionKicker>
           <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Servicios pensados para acompañarte de punta a punta
           </h2>

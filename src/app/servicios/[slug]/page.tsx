@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import CTA from "@/components/CTA";
 import ScrollReveal from "@/components/ScrollReveal";
 import ServiceIcon3D from "@/components/ServiceIcon3D";
+import SectionKicker from "@/components/SectionKicker";
 import { services, getServiceBySlug } from "@/lib/services";
 import { siteConfig } from "@/lib/site-config";
 
@@ -85,9 +86,7 @@ export default async function ServicePage({
 
             <ScrollReveal delay={0.1}>
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-400">
-                  Incluye
-                </p>
+                <SectionKicker>Incluye</SectionKicker>
                 <ul className="mt-5 space-y-3">
                   {service.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5 text-sm text-neutral-200">
@@ -106,9 +105,7 @@ export default async function ServicePage({
         <section className="relative px-5 pb-24 sm:px-8">
           <div className="mx-auto max-w-5xl">
             <ScrollReveal>
-              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
-                Otros servicios
-              </p>
+              <SectionKicker tone="muted" className="mb-5">Otros servicios</SectionKicker>
               <div className="flex flex-wrap gap-3">
                 {otherServices.map((s) => (
                   <Link
