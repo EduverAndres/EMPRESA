@@ -86,19 +86,19 @@ export const services: Service[] = [
     icon: "ai",
   },
   {
-    slug: "analisis-de-datos",
-    title: "Análisis de datos",
+    slug: "ciencia-de-datos",
+    title: "Ciencia de datos & analítica",
     short:
-      "Convertimos datos dispersos en dashboards y reportes que sí se usan para decidir.",
+      "Convertimos datos dispersos en modelos, predicciones y dashboards que sí se usan para decidir.",
     description: [
-      "Diseñamos pipelines y dashboards que transforman datos crudos en información accionable, usando las herramientas de análisis y visualización más adecuadas para el volumen y tipo de datos.",
-      "Trabajamos desde la limpieza y modelado de datos hasta la visualización final para tu equipo.",
+      "Aplicamos estadística, modelado y análisis exploratorio para entender qué están diciendo tus datos, y construimos modelos predictivos cuando el problema lo requiere — no solo reportes bonitos.",
+      "Trabajamos desde la limpieza y el modelado de datos hasta dashboards y visualizaciones que tu equipo realmente usa para decidir.",
     ],
     features: [
+      "Análisis exploratorio y modelado estadístico",
+      "Modelos predictivos y de clasificación",
+      "Limpieza, transformación y pipelines de datos",
       "Dashboards e indicadores en tiempo real",
-      "Limpieza, modelado y transformación de datos",
-      "Reportes automatizados",
-      "Visualizaciones a medida",
     ],
     icon: "data",
   },

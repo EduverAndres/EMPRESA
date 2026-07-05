@@ -21,7 +21,7 @@ export default function Hero() {
           className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/5 px-4 py-1.5 text-xs font-medium text-brand-400 sm:text-sm"
         >
           <Sparkles size={14} className="text-brand-400" />
-          Estudio de desarrollo de software
+          Desarrollo de software & ciencia de datos
         </motion.div>
 
         <motion.h1
@@ -30,7 +30,7 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.1 }}
           className="font-display max-w-4xl text-4xl font-semibold leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl"
         >
-          Convertimos ideas en{" "}
+          Convertimos ideas y datos en{" "}
           <span className="text-gradient-brand">software que despega</span>
         </motion.h1>
 
@@ -40,9 +40,9 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="mt-6 max-w-2xl text-balance text-base text-neutral-300 sm:text-lg"
         >
-          Diseñamos y construimos software a medida — desde plataformas web
-          hasta aplicaciones móviles — con procesos claros, atención al
-          detalle y un compromiso real con el resultado de cada cliente.
+          Diseñamos software a medida y convertimos datos en decisiones —
+          desde plataformas web y aplicaciones móviles hasta modelos y
+          dashboards que sostienen tu negocio por dentro.
         </motion.p>
 
         <motion.div

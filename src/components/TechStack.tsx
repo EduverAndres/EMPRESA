@@ -9,8 +9,8 @@ const rowA = [
 ];
 
 const rowB = [
-  "Bases de datos relacionales",
-  "Bases de datos no relacionales",
+  "Ciencia de datos y modelos predictivos",
+  "Bases de datos relacionales y no relacionales",
   "Integraciones de inteligencia artificial",
   "Automatización de procesos",
   "DevOps y despliegue continuo",

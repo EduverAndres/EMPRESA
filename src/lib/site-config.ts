@@ -3,7 +3,7 @@ export const siteConfig = {
   fullName: "Órbita Software",
   tagline: "Software que despega contigo",
   description:
-    "Órbita es un estudio de desarrollo de software especializado en construir productos digitales a medida, con procesos claros, calidad técnica y compromiso real con cada cliente.",
+    "Órbita es un estudio de desarrollo de software y ciencia de datos: construimos productos digitales a medida y convertimos datos en decisiones, con procesos claros, calidad técnica y compromiso real con cada cliente.",
   founder: "Eduver Gutiérrez",
   email: "eduverjimenez07@gmail.com",
   whatsapp: {
