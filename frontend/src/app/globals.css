@@ -105,16 +105,6 @@ body {
   animation: pulse-glow 4s ease-in-out infinite;
 }
 
-/* ---- Sphere grid: slow full-turn rotation for the dot-grid hero sphere ---- */
-@keyframes globe-spin {
-  from { transform: rotateY(0deg); }
-  to { transform: rotateY(360deg); }
-}
-
-.animate-globe-spin {
-  animation: globe-spin 24s linear infinite;
-}
-
 /* ---- Ambient site-wide backdrop: drifting grid, glows and scan beam ---- */
 .bg-grid-drift {
   background-image:
@@ -260,8 +250,7 @@ body {
   .particle,
   .animate-compass-settle,
   .animate-marquee-left,
-  .animate-marquee-right,
-  .animate-globe-spin {
+  .animate-marquee-right {
     animation: none;
   }
 }

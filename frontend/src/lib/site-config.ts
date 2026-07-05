@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "NEXUS",
   fullName: "NEXUS",
-  tagline: "Software que despega contigo",
+  tagline: "Tecnología inteligente",
   description:
     "NEXUS es un estudio de ingeniería especializado en desarrollo de software full stack, ingeniería de datos, inteligencia artificial, automatización de procesos, soluciones en la nube y analítica avanzada — con procesos claros y compromiso real con cada cliente.",
   founder: "Eduver Gutiérrez",

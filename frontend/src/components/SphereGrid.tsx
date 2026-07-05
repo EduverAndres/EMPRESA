@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 function generatePoints(count: number) {
   const points: { x: number; y: number; z: number }[] = [];
   const goldenAngle = Math.PI * (3 - Math.sqrt(5));
@@ -47,8 +51,12 @@ function mix(hexA: string, hexB: string, t: number) {
   return `rgb(${r}, ${g}, ${bl})`;
 }
 
+const px = (n: number) => `${n.toFixed(2)}px`;
+
 const DOT_COUNT = 260;
 const POINTS = generatePoints(DOT_COUNT);
+// One full turn every 24s — matches the previous CSS animation's pace.
+const ANGULAR_SPEED = (Math.PI * 2) / 24000;
 
 export default function SphereGrid({
   size = 280,
@@ -58,42 +66,79 @@ export default function SphereGrid({
   className?: string;
 }) {
   const radius = size / 2;
-  const dotSize = Math.max(4, size * 0.05);
+  const dotSize = Math.max(4, size * 0.058);
+  const half = Number((dotSize / 2).toFixed(2));
+  const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    let angle = 0;
+    let last = performance.now();
+    let raf = 0;
+
+    const tick = (now: number) => {
+      const dt = now - last;
+      last = now;
+      angle += ANGULAR_SPEED * dt;
+
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+
+      for (let i = 0; i < POINTS.length; i++) {
+        const el = dotRefs.current[i];
+        if (!el) continue;
+        const p = POINTS[i];
+        // Rotate around the Y axis. Each dot keeps its own plane facing the
+        // camera at all times (only its position is animated, never its own
+        // rotation), which is what keeps it a perfect circle instead of
+        // stretching into an ellipse at grazing angles.
+        const rx = p.x * cos - p.z * sin;
+        const rz = p.x * sin + p.z * cos;
+        el.style.transform = `translate3d(${px(rx * radius)}, ${px(-p.y * radius)}, ${px(rz * radius)})`;
+      }
+
+      raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [radius]);
 
   return (
     <div
       className={`relative ${className}`}
-      style={{ width: size, height: size, perspective: size * 2.6 }}
+      style={{ width: size, height: size, perspective: Math.round(size * 1.9) }}
     >
       <div
         className="absolute inset-0 rounded-full blur-2xl"
-        style={{ background: "radial-gradient(circle at 38% 35%, rgba(217,4,41,0.35), transparent 65%)" }}
+        style={{ background: "radial-gradient(circle at 38% 35%, rgba(217,4,41,0.4), transparent 65%)" }}
       />
-      <div
-        className="animate-globe-spin"
-        style={{
-          position: "absolute",
-          inset: 0,
-          transformStyle: "preserve-3d",
-        }}
-      >
+      <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
         {POINTS.map((p, i) => {
           const color = litColor(p.x, p.y, p.z);
           return (
             <span
               key={i}
+              ref={(el) => {
+                dotRefs.current[i] = el;
+              }}
               style={{
                 position: "absolute",
                 top: "50%",
                 left: "50%",
                 width: dotSize,
                 height: dotSize,
-                marginLeft: -dotSize / 2,
-                marginTop: -dotSize / 2,
+                marginLeft: -half,
+                marginTop: -half,
                 borderRadius: "9999px",
-                transform: `translate3d(${p.x * radius}px, ${-p.y * radius}px, ${p.z * radius}px)`,
-                background: `radial-gradient(circle at 35% 30%, rgba(255,255,255,0.35), ${color} 65%, rgba(0,0,0,0.6) 100%)`,
-                boxShadow: "0 0 2px rgba(0,0,0,0.6)",
+                transform: `translate3d(${px(p.x * radius)}, ${px(-p.y * radius)}, ${px(p.z * radius)})`,
+                background: `radial-gradient(circle at 32% 28%, rgba(255,255,255,0.55), ${color} 55%, rgba(0,0,0,0.75) 100%)`,
+                border: "0.5px solid rgba(0,0,0,0.4)",
+                boxShadow:
+                  "inset 0 1px 1px rgba(255,255,255,0.35), inset 0 -1px 1.5px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.5)",
               }}
             />
           );

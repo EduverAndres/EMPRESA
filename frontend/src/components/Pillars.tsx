@@ -1,3 +1,4 @@
+import { Sparkles } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
 import TiltCard from "./TiltCard";
 import BrowserIcon3D from "./icons3d/BrowserIcon3D";
@@ -9,6 +10,10 @@ export default function Pillars() {
     <section className="relative px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <ScrollReveal className="mx-auto max-w-2xl text-center">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/5 px-4 py-1.5 text-xs font-medium text-brand-400 sm:text-sm">
+            <Sparkles size={14} className="text-brand-400" />
+            Desarrollo de software & ciencia de datos
+          </div>
           <SectionKicker className="mb-3">Lo que hacemos</SectionKicker>
           <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Dos disciplinas, un mismo equipo

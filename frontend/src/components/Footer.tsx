@@ -1,8 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, MessageCircle } from "lucide-react";
 import { FacebookIcon, InstagramIcon, LinkedinIcon } from "./icons/BrandIcons";
-import Logo from "./Logo";
 import SectionKicker from "./SectionKicker";
+import Wordmark from "./Wordmark";
 import { siteConfig } from "@/lib/site-config";
 
 const socialLinks = [
@@ -20,12 +21,16 @@ export default function Footer() {
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
           <div>
             <Link href="/#inicio" className="flex items-center gap-2.5">
-              <Logo size={32} />
-              <span className="font-display text-lg font-semibold tracking-tight text-white">
-                {siteConfig.name}
-              </span>
+              <Image
+                src="/logo-mark.png"
+                alt={siteConfig.name}
+                width={32}
+                height={32}
+                className="rounded-full"
+              />
+              <Wordmark className="text-lg" />
             </Link>
-            <p className="mt-3 font-mono text-xs tracking-wide text-brand-400">
+            <p className="mt-3 font-mono text-xs uppercase tracking-[0.2em] text-brand-400">
               {siteConfig.tagline}
             </p>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-neutral-400">

@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import Logo from "./Logo";
+import Wordmark from "./Wordmark";
 import { siteConfig } from "@/lib/site-config";
 
 export default function Navbar() {
@@ -35,12 +36,17 @@ export default function Navbar() {
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
         <Link href="/#inicio" className="flex items-center gap-2.5 group">
-          <Logo size={32} className="transition-transform group-hover:scale-105" />
+          <Image
+            src="/logo-mark.png"
+            alt={siteConfig.name}
+            width={32}
+            height={32}
+            priority
+            className="rounded-full transition-transform group-hover:scale-105"
+          />
           <span className="flex flex-col leading-none">
-            <span className="font-display text-lg font-semibold tracking-tight text-white">
-              {siteConfig.name}
-            </span>
-            <span className="hidden font-mono text-[10px] tracking-wide text-neutral-500 sm:block">
+            <Wordmark className="text-lg" />
+            <span className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-500 sm:block">
               {siteConfig.tagline}
             </span>
           </span>
