@@ -12,7 +12,7 @@ export default function Services() {
         <ScrollReveal className="mx-auto max-w-2xl text-center">
           <SectionKicker className="mb-3">Qué hacemos</SectionKicker>
           <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-            Servicios pensados para acompañarte de punta a punta
+            Servicios pensados para acompañarte de punta a punta.
           </h2>
           <p className="mt-4 text-neutral-400">
             Desde el producto que ve tu usuario hasta la infraestructura de
