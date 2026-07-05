@@ -1,6 +1,7 @@
 import { Mail, MessageCircle } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
 import SectionKicker from "./SectionKicker";
+import ContactForm from "./ContactForm";
 import { siteConfig } from "@/lib/site-config";
 
 export default function CTA() {
@@ -37,6 +38,18 @@ export default function CTA() {
               <Mail size={16} />
               {siteConfig.email}
             </a>
+          </div>
+
+          <div className="relative my-10 flex items-center gap-4">
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-xs font-medium uppercase tracking-widest text-neutral-500">
+              o déjanos tus datos
+            </span>
+            <div className="h-px flex-1 bg-white/10" />
+          </div>
+
+          <div className="relative rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+            <ContactForm />
           </div>
         </div>
       </ScrollReveal>

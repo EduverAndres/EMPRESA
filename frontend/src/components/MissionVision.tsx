@@ -2,6 +2,7 @@ import { Rocket, Telescope } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
 import TiltCard from "./TiltCard";
 import SectionKicker from "./SectionKicker";
+import { siteConfig } from "@/lib/site-config";
 
 export default function MissionVision() {
   return (
@@ -13,9 +14,9 @@ export default function MissionVision() {
             Un rumbo claro detrás de cada línea de código
           </h2>
           <p className="mt-4 text-neutral-400">
-            En Órbita trabajamos con un propósito y una dirección definidos:
-            construir software que genere valor real para quienes confían en
-            nosotros.
+            En {siteConfig.name} trabajamos con un propósito y una dirección
+            definidos: construir software que genere valor real para quienes
+            confían en nosotros.
           </p>
         </ScrollReveal>
 

@@ -1,9 +1,9 @@
 export const siteConfig = {
-  name: "Órbita",
-  fullName: "Órbita Software",
+  name: "NEXUS",
+  fullName: "NEXUS",
   tagline: "Software que despega contigo",
   description:
-    "Órbita es un estudio de desarrollo de software y ciencia de datos: construimos productos digitales a medida y convertimos datos en decisiones, con procesos claros, calidad técnica y compromiso real con cada cliente.",
+    "NEXUS es un estudio de ingeniería especializado en desarrollo de software full stack, ingeniería de datos, inteligencia artificial, automatización de procesos, soluciones en la nube y analítica avanzada — con procesos claros y compromiso real con cada cliente.",
   founder: "Eduver Gutiérrez",
   email: "eduverjimenez07@gmail.com",
   whatsapp: {
@@ -11,7 +11,7 @@ export const siteConfig = {
     href: "https://wa.me/573332369167",
   },
   social: {
-    instagram: "#",
+    instagram: "https://www.instagram.com/orbitalabssoftware/",
     linkedin: "#",
     facebook: "#",
   },

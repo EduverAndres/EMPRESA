@@ -5,15 +5,15 @@
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-space-grotesk);
 
-  --color-ink-950: #050507;
-  --color-ink-900: #0a0a0d;
-  --color-ink-800: #101014;
-  --color-panel: #121217;
+  --color-ink-950: #0d0d0d;
+  --color-ink-900: #1b1b1b;
+  --color-ink-800: #242424;
+  --color-panel: #1b1b1b;
   --color-brand-400: #ff6b78;
   --color-brand-500: #ff3245;
-  --color-brand-600: #e21630;
-  --color-brand-700: #a80f24;
-  --color-brand-900: #3d0812;
+  --color-brand-600: #d90429;
+  --color-brand-700: #8b0000;
+  --color-brand-900: #2b0509;
 }
 
 html {
@@ -105,21 +105,14 @@ body {
   animation: pulse-glow 4s ease-in-out infinite;
 }
 
-/* ---- Wireframe globe: minimalist rotating 3D sphere made of great circles ---- */
+/* ---- Sphere grid: slow full-turn rotation for the dot-grid hero sphere ---- */
 @keyframes globe-spin {
   from { transform: rotateY(0deg); }
   to { transform: rotateY(360deg); }
 }
-@keyframes globe-spin-rev {
-  from { transform: rotateY(360deg); }
-  to { transform: rotateY(0deg); }
-}
 
 .animate-globe-spin {
   animation: globe-spin 24s linear infinite;
-}
-.animate-globe-spin-slow {
-  animation: globe-spin-rev 40s linear infinite;
 }
 
 /* ---- Ambient site-wide backdrop: drifting grid, glows and scan beam ---- */
@@ -268,8 +261,7 @@ body {
   .animate-compass-settle,
   .animate-marquee-left,
   .animate-marquee-right,
-  .animate-globe-spin,
-  .animate-globe-spin-slow {
+  .animate-globe-spin {
     animation: none;
   }
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import WireframeGlobe from "./WireframeGlobe";
+import SphereGrid from "./SphereGrid";
 
 export default function FloatingShapes() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,13 +39,13 @@ export default function FloatingShapes() {
       {/* soft red glow behind the globe */}
       <div className="absolute left-1/2 top-16 h-72 w-72 -translate-x-1/2 rounded-full bg-brand-600/20 blur-[110px] sm:h-[26rem] sm:w-[26rem]" />
 
-      {/* minimalist wireframe globe centerpiece */}
+      {/* dot-grid sphere centerpiece */}
       <motion.div
         style={{ x: globeX, y: globeY, rotateX: tiltX, rotateY: tiltY }}
         className="absolute left-1/2 top-[16%] -translate-x-1/2 [transform-style:preserve-3d]"
       >
         <div className="scale-75 sm:scale-100">
-          <WireframeGlobe size={280} />
+          <SphereGrid size={280} />
         </div>
       </motion.div>
 
