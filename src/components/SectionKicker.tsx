@@ -11,13 +11,10 @@ export default function SectionKicker({
 }) {
   return (
     <p
-      className={`font-mono text-xs font-semibold uppercase tracking-[0.2em] ${
+      className={`text-xs font-semibold uppercase tracking-[0.2em] ${
         tone === "brand" ? "text-brand-400" : "text-neutral-500"
       } ${className}`}
     >
-      <span className={tone === "brand" ? "text-brand-600" : "text-neutral-600"}>
-        {"//"}
-      </span>{" "}
       {children}
     </p>
   );
