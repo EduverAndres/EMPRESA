@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import { siteConfig } from "@/lib/site-config";
 import SiteBackground from "@/components/SiteBackground";
+import ChatWidget from "@/components/ChatWidget";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,6 +39,7 @@ export default function RootLayout({
       <body className="min-h-full bg-ink-950">
         <SiteBackground />
         <div className="relative z-10 flex min-h-full flex-col">{children}</div>
+        <ChatWidget />
       </body>
     </html>
   );

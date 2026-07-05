@@ -95,11 +95,12 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-neutral-500 sm:flex-row">
+        <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-8 text-xs text-neutral-500 sm:flex-row sm:gap-4">
           <p>
             © {year} {siteConfig.fullName}. Todos los derechos reservados.
           </p>
           <p>{siteConfig.tagline}</p>
+          <p>Powered by {siteConfig.name} &copy;</p>
         </div>
       </div>
     </footer>

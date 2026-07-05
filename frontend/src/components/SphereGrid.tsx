@@ -2,41 +2,9 @@
 
 import { useEffect, useRef } from "react";
 
-function generatePoints(count: number) {
-  const points: { x: number; y: number; z: number }[] = [];
-  const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+type RGB = [number, number, number];
 
-  for (let i = 0; i < count; i++) {
-    const y = 1 - (i / (count - 1)) * 2;
-    const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
-    const theta = goldenAngle * i;
-    points.push({
-      x: Math.cos(theta) * radiusAtY,
-      y,
-      z: Math.sin(theta) * radiusAtY,
-    });
-  }
-  return points;
-}
-
-// Light coming from the upper-left-front, like the reference render.
-const LIGHT = { x: -0.6, y: 0.4, z: 0.75 };
-const LIGHT_LEN = Math.sqrt(LIGHT.x ** 2 + LIGHT.y ** 2 + LIGHT.z ** 2);
-
-function litColor(nx: number, ny: number, nz: number) {
-  const dot = (nx * LIGHT.x + ny * LIGHT.y + nz * LIGHT.z) / LIGHT_LEN;
-  const t = Math.max(0, dot);
-
-  // 0 -> near-black graphite, 0.55 -> intense red, 1 -> bright hot highlight
-  if (t < 0.55) {
-    const k = t / 0.55;
-    return mix("#141414", "#d90429", k);
-  }
-  const k = (t - 0.55) / 0.45;
-  return mix("#d90429", "#ff8a94", k);
-}
-
-function mix(hexA: string, hexB: string, t: number) {
+function mix(hexA: string, hexB: string, t: number): RGB {
   const a = parseInt(hexA.slice(1), 16);
   const b = parseInt(hexB.slice(1), 16);
   const ar = (a >> 16) & 255,
@@ -45,17 +13,49 @@ function mix(hexA: string, hexB: string, t: number) {
   const br = (b >> 16) & 255,
     bg = (b >> 8) & 255,
     bb = b & 255;
-  const r = Math.round(ar + (br - ar) * t);
-  const g = Math.round(ag + (bg - ag) * t);
-  const bl = Math.round(ab + (bb - ab) * t);
-  return `rgb(${r}, ${g}, ${bl})`;
+  return [
+    Math.round(ar + (br - ar) * t),
+    Math.round(ag + (bg - ag) * t),
+    Math.round(ab + (bb - ab) * t),
+  ];
 }
 
-const px = (n: number) => `${n.toFixed(2)}px`;
+// Light coming mostly from the left, like the reference render — the split
+// needs to read left/right across the visible face, not front/back (which
+// would hide the dark half behind the sphere and make every visible dot
+// look lit).
+const LIGHT = { x: -0.95, y: 0.2, z: 0.25 };
+const LIGHT_LEN = Math.sqrt(LIGHT.x ** 2 + LIGHT.y ** 2 + LIGHT.z ** 2);
+
+function litColor(nx: number, ny: number, nz: number): RGB {
+  const dot = (nx * LIGHT.x + ny * LIGHT.y + nz * LIGHT.z) / LIGHT_LEN;
+  const t = Math.max(0, dot);
+
+  // 0 -> near-black graphite, 0.55 -> intense red, 1 -> bright hot highlight
+  if (t < 0.55) {
+    return mix("#141414", "#d90429", t / 0.55);
+  }
+  return mix("#d90429", "#ff8a94", (t - 0.55) / 0.45);
+}
+
+function generatePoints(count: number) {
+  const points: { x: number; y: number; z: number; color: RGB }[] = [];
+  const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+
+  for (let i = 0; i < count; i++) {
+    const y = 1 - (i / (count - 1)) * 2;
+    const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
+    const theta = goldenAngle * i;
+    const x = Math.cos(theta) * radiusAtY;
+    const z = Math.sin(theta) * radiusAtY;
+    points.push({ x, y, z, color: litColor(x, y, z) });
+  }
+  return points;
+}
 
 const DOT_COUNT = 260;
 const POINTS = generatePoints(DOT_COUNT);
-// One full turn every 24s — matches the previous CSS animation's pace.
+// One full turn every 24s.
 const ANGULAR_SPEED = (Math.PI * 2) / 24000;
 
 export default function SphereGrid({
@@ -65,85 +65,91 @@ export default function SphereGrid({
   size?: number;
   className?: string;
 }) {
-  const radius = size / 2;
-  const dotSize = Math.max(4, size * 0.058);
-  const half = Number((dotSize / 2).toFixed(2));
-  const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
-    }
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    ctx.scale(dpr, dpr);
+
+    const radius = size / 2;
+    const dotRadius = Math.max(2, size * 0.029);
+    // Dots sitting exactly at the sphere's equator/edge would otherwise be
+    // centered right on the canvas boundary, clipping them in half. Pulling
+    // the sphere in a bit leaves room for the dot's own radius on every side.
+    const sphereRadius = radius - dotRadius * 1.4;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const order = POINTS.map((_, i) => i);
+
+    const draw = (angle: number) => {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+
+      ctx.clearRect(0, 0, size, size);
+
+      // Painter's algorithm: draw back-to-front so near dots overlap far ones.
+      order.sort((a, b) => {
+        const za = POINTS[a].x * sin + POINTS[a].z * cos;
+        const zb = POINTS[b].x * sin + POINTS[b].z * cos;
+        return za - zb;
+      });
+
+      for (const i of order) {
+        const p = POINTS[i];
+        const rx = p.x * cos - p.z * sin;
+        const rz = p.x * sin + p.z * cos;
+
+        const depth = (rz + 1) / 2; // 0 (back) .. 1 (front)
+        const scale = 0.55 + 0.45 * depth;
+        const cx = radius + rx * sphereRadius;
+        const cy = radius + -p.y * sphereRadius;
+        const r = dotRadius * scale;
+        const [red, green, blue] = p.color;
+
+        const grad = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.4, r * 0.1, cx, cy, r);
+        grad.addColorStop(0, "rgba(255,255,255,0.55)");
+        grad.addColorStop(0.55, `rgb(${red}, ${green}, ${blue})`);
+        grad.addColorStop(1, "rgba(0,0,0,0.8)");
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+    };
+
+    draw(0);
+    if (reduced) return;
+
+    let raf = 0;
     let angle = 0;
     let last = performance.now();
-    let raf = 0;
 
     const tick = (now: number) => {
       const dt = now - last;
       last = now;
       angle += ANGULAR_SPEED * dt;
-
-      const cos = Math.cos(angle);
-      const sin = Math.sin(angle);
-
-      for (let i = 0; i < POINTS.length; i++) {
-        const el = dotRefs.current[i];
-        if (!el) continue;
-        const p = POINTS[i];
-        // Rotate around the Y axis. Each dot keeps its own plane facing the
-        // camera at all times (only its position is animated, never its own
-        // rotation), which is what keeps it a perfect circle instead of
-        // stretching into an ellipse at grazing angles.
-        const rx = p.x * cos - p.z * sin;
-        const rz = p.x * sin + p.z * cos;
-        el.style.transform = `translate3d(${px(rx * radius)}, ${px(-p.y * radius)}, ${px(rz * radius)})`;
-      }
-
+      draw(angle);
       raf = requestAnimationFrame(tick);
     };
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [radius]);
+  }, [size]);
 
   return (
-    <div
-      className={`relative ${className}`}
-      style={{ width: size, height: size, perspective: Math.round(size * 1.9) }}
-    >
+    <div className={`relative ${className}`} style={{ width: size, height: size }}>
       <div
         className="absolute inset-0 rounded-full blur-2xl"
         style={{ background: "radial-gradient(circle at 38% 35%, rgba(217,4,41,0.4), transparent 65%)" }}
       />
-      <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d" }}>
-        {POINTS.map((p, i) => {
-          const color = litColor(p.x, p.y, p.z);
-          return (
-            <span
-              key={i}
-              ref={(el) => {
-                dotRefs.current[i] = el;
-              }}
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                width: dotSize,
-                height: dotSize,
-                marginLeft: -half,
-                marginTop: -half,
-                borderRadius: "9999px",
-                transform: `translate3d(${px(p.x * radius)}, ${px(-p.y * radius)}, ${px(p.z * radius)})`,
-                background: `radial-gradient(circle at 32% 28%, rgba(255,255,255,0.55), ${color} 55%, rgba(0,0,0,0.75) 100%)`,
-                border: "0.5px solid rgba(0,0,0,0.4)",
-                boxShadow:
-                  "inset 0 1px 1px rgba(255,255,255,0.35), inset 0 -1px 1.5px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.5)",
-              }}
-            />
-          );
-        })}
-      </div>
+      <canvas ref={canvasRef} style={{ width: size, height: size }} />
     </div>
   );
 }
