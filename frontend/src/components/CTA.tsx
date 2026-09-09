@@ -1,58 +1,112 @@
-import { Mail, MessageCircle } from "lucide-react";
-import ScrollReveal from "./ScrollReveal";
+import { Mail, MessageCircle, Clock, Lock, ArrowUpRight } from "lucide-react";
+import Reveal from "./Reveal";
 import SectionKicker from "./SectionKicker";
 import ContactForm from "./ContactForm";
 import { siteConfig } from "@/lib/site-config";
 
+const canales = [
+  {
+    icon: MessageCircle,
+    label: "WhatsApp",
+    value: siteConfig.whatsapp.display,
+    href: siteConfig.whatsapp.href,
+    externo: true,
+  },
+  {
+    icon: Mail,
+    label: "Correo",
+    value: siteConfig.email,
+    href: `mailto:${siteConfig.email}`,
+    externo: false,
+  },
+];
+
+/**
+ * Cierre de la página: dos columnas reales, 5/7.
+ *
+ * La caja exterior con borde desapareció. El formulario conserva la suya —
+ * es la única de la página que la necesita, porque delimita una zona donde se
+ * escribe. La separación entre las dos columnas la hace el espacio.
+ *
+ * Los canales de contacto se listan con una fila por canal separada por una
+ * línea de un píxel, en vez de dos tarjetas con borde completo: al quedarse
+ * la columna sin caja contenedora, dos rectángulos sueltos se leían como
+ * restos del diseño anterior.
+ */
 export default function CTA() {
   return (
-    <section id="contacto" className="relative px-5 py-24 sm:px-8 sm:py-32">
-      <ScrollReveal className="mx-auto max-w-4xl">
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-brand-900/40 via-ink-900 to-ink-900 px-6 py-14 text-center sm:px-12 sm:py-20">
-          <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-brand-600/25 blur-[90px]" />
-          <div className="pointer-events-none absolute -right-10 -bottom-10 h-56 w-56 rounded-full bg-brand-600/20 blur-[90px]" />
+    <section
+      id="contacto"
+      className="relative overflow-hidden px-5 pt-28 pb-24 sm:px-8 sm:pt-48 sm:pb-40"
+    >
+      {/* A ancho completo de la sección, no del contenedor: ver `.halo-contacto`. */}
+      <div aria-hidden className="halo-contacto" />
 
-          <SectionKicker className="relative mb-3">Hablemos</SectionKicker>
-          <h2 className="relative font-display mx-auto max-w-xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-            ¿Tienes un proyecto en mente?
-          </h2>
-          <p className="relative mx-auto mt-4 max-w-lg text-neutral-300">
-            Cada proyecto recibe atención cercana y dedicada, de principio a
-            fin. Cuéntanos tu idea y hablemos de cómo hacerla realidad.
-          </p>
+      <Reveal className="mx-auto max-w-6xl">
+        <div className="relative">
+          <div className="relative grid gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="flex flex-col lg:col-span-5">
+              <SectionKicker className="mb-4">Hablemos</SectionKicker>
+              <h2 className="font-display text-titulo-seccion font-semibold text-white">
+                ¿Tienes un proyecto en mente?
+              </h2>
+              <p className="mt-5 text-entrada text-fg-muted">
+                Cada proyecto recibe atención cercana y dedicada, de principio a
+                fin. Cuéntanos tu idea y hablemos de cómo hacerla realidad.
+              </p>
 
-          <div className="relative mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a
-              href={siteConfig.whatsapp.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-8 py-3.5 text-sm font-semibold text-white shadow-[0_0_30px_rgba(226,22,48,0.4)] transition-all hover:bg-brand-500 hover:shadow-[0_0_40px_rgba(226,22,48,0.6)] sm:w-auto"
-            >
-              <MessageCircle size={16} />
-              Escríbenos por WhatsApp
-            </a>
-            <a
-              href={`mailto:${siteConfig.email}`}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 px-8 py-3.5 text-sm font-semibold text-white/90 transition-colors hover:border-white/30 hover:bg-white/5 sm:w-auto"
-            >
-              <Mail size={16} />
-              {siteConfig.email}
-            </a>
-          </div>
+              <div className="mt-10 border-y border-[var(--color-line)]">
+                {canales.map((canal, i) => (
+                  <a
+                    key={canal.label}
+                    href={canal.href}
+                    {...(canal.externo
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
+                    className={`group flex items-center gap-4 py-4 ${
+                      i > 0 ? "border-t border-[var(--color-line)]" : ""
+                    }`}
+                  >
+                    <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-brand-600/15 text-accent-400 transition-colors duration-300 group-hover:bg-brand-600/30">
+                      <canal.icon size={18} />
+                    </span>
 
-          <div className="relative my-10 flex items-center gap-4">
-            <div className="h-px flex-1 bg-white/10" />
-            <span className="text-xs font-medium uppercase tracking-widest text-neutral-500">
-              o déjanos tus datos
-            </span>
-            <div className="h-px flex-1 bg-white/10" />
-          </div>
+                    <span className="flex min-w-0 flex-col">
+                      <span className="text-kicker font-semibold text-fg-subtle">
+                        {canal.label}
+                      </span>
+                      <span className="mt-1 truncate text-sm font-medium text-white">
+                        {canal.value}
+                      </span>
+                    </span>
 
-          <div className="relative rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-            <ContactForm />
+                    <ArrowUpRight
+                      size={16}
+                      aria-hidden
+                      className="ml-auto flex-none text-fg-subtle transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-400"
+                    />
+                  </a>
+                ))}
+              </div>
+
+              <ul className="mt-8 flex flex-col gap-3 text-sm text-fg-muted">
+                <li className="flex items-start gap-2.5">
+                  <Clock size={15} className="mt-0.5 flex-none text-accent-400" />
+                  Te respondemos por el medio que prefieras.
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <Lock size={15} className="mt-0.5 flex-none text-accent-400" />
+                  Tus datos se usan solo para responderte. Nada más.
+                </li>
+              </ul>
+            </div>
+
+            <div className="panel-contacto rounded-2xl p-6 shadow-[0_30px_80px_-45px_rgba(0,0,0,0.95)] sm:p-8 lg:col-span-7">
+              <ContactForm />
+            </div>
           </div>
         </div>
-      </ScrollReveal>
+      </Reveal>
     </section>
   );
 }

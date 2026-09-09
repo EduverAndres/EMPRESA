@@ -31,7 +31,7 @@ export default function PhoneIcon3D({
             width: depth,
             height: h,
             left: w - depth,
-            background: "linear-gradient(to bottom, rgba(255,70,85,0.6), rgba(30,3,6,0.9))",
+            background: "linear-gradient(to bottom, rgba(70,140,250,0.6), rgba(8,15,34,0.9))",
             transform: `rotateY(90deg) translateZ(${w - depth / 2}px)`,
           }}
         />
@@ -41,7 +41,7 @@ export default function PhoneIcon3D({
           style={{
             width: w,
             height: h,
-            background: "linear-gradient(155deg, rgba(140,10,24,0.9), rgba(30,3,6,0.95))",
+            background: "linear-gradient(155deg, rgba(25,68,164,0.9), rgba(8,15,34,0.95))",
             transform: `translateZ(${depth}px)`,
           }}
         >
@@ -62,9 +62,9 @@ export default function PhoneIcon3D({
                   height: dot,
                   background:
                     i === 0
-                      ? "rgba(255,180,185,0.9)"
+                      ? "rgba(176,222,253,0.9)"
                       : "rgba(255,255,255,0.15)",
-                  boxShadow: i === 0 ? "0 0 10px rgba(255,80,95,0.7)" : undefined,
+                  boxShadow: i === 0 ? "0 0 10px rgba(82,150,252,0.7)" : undefined,
                 }}
               />
             ))}

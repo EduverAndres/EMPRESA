@@ -31,7 +31,7 @@ export default function BrowserIcon3D({
             width: depth,
             height: h,
             left: w - depth,
-            background: "linear-gradient(to bottom, rgba(60,5,12,0.9), rgba(20,2,4,0.95))",
+            background: "linear-gradient(to bottom, rgba(13,29,68,0.9), rgba(6,11,26,0.95))",
             transform: `rotateY(90deg) translateZ(${w - depth / 2}px)`,
           }}
         />
@@ -42,7 +42,7 @@ export default function BrowserIcon3D({
             width: w,
             height: depth,
             top: h - depth,
-            background: "linear-gradient(to right, rgba(20,2,4,0.95), rgba(60,5,12,0.9))",
+            background: "linear-gradient(to right, rgba(6,11,26,0.95), rgba(13,29,68,0.9))",
             transform: `rotateX(-90deg) translateZ(${depth / 2}px)`,
           }}
         />
@@ -52,7 +52,7 @@ export default function BrowserIcon3D({
           style={{
             width: w,
             height: h,
-            background: "#161318",
+            background: "#0e1526",
             transform: `translateZ(${depth}px)`,
           }}
         >
@@ -60,7 +60,7 @@ export default function BrowserIcon3D({
             className="flex items-center gap-[6px] border-b border-white/10 px-2.5"
             style={{
               height: topBar,
-              background: "linear-gradient(135deg, rgba(255,80,95,0.35), rgba(60,5,12,0.5))",
+              background: "linear-gradient(135deg, rgba(82,150,252,0.35), rgba(13,29,68,0.5))",
             }}
           >
             <span className="h-[7px] w-[7px] rounded-full bg-brand-400" />

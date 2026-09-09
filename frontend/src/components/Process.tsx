@@ -1,6 +1,6 @@
 import { Search, Layers, Repeat, LifeBuoy } from "lucide-react";
-import ScrollReveal from "./ScrollReveal";
-import SectionKicker from "./SectionKicker";
+import Reveal from "./Reveal";
+import SectionHeading from "./SectionHeading";
 
 const steps = [
   {
@@ -29,39 +29,68 @@ const steps = [
   },
 ];
 
+/**
+ * Sección de ancho completo: el rail de pasos sale de la caja de contenido y
+ * se corta contra el borde derecho de la pantalla.
+ *
+ * El corte es intencionado — comunica que el proceso continúa y obliga al ojo
+ * a moverse en horizontal después de dos secciones bajando en vertical. Las
+ * cajas que antes rodeaban cada icono desaparecen: aquí separan el espacio y
+ * el número, no un borde.
+ */
 export default function Process() {
   return (
-    <section className="relative px-5 py-24 sm:px-8 sm:py-32">
-      <div className="mx-auto max-w-6xl">
-        <ScrollReveal className="mx-auto max-w-2xl text-center">
-          <SectionKicker className="mb-3">Cómo trabajamos</SectionKicker>
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-            Un proceso claro, de principio a fin
-          </h2>
-        </ScrollReveal>
+    <section className="relative pt-16 pb-28 sm:pt-24 sm:pb-56">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+        <SectionHeading
+          align="left"
+          kicker="Cómo trabajamos"
+          title="Un proceso claro, de principio a fin"
+          description="Cuatro etapas, sin sorpresas: en cada una sabes qué se está haciendo y qué sigue después."
+        />
+      </div>
 
-        <div className="relative mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="pointer-events-none absolute left-0 right-0 top-8 hidden h-px bg-gradient-to-r from-transparent via-white/15 to-transparent lg:block" />
-
-          {steps.map((step, i) => (
-            <ScrollReveal key={step.title} delay={i * 0.08} className="relative">
-              <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
-                <div className="relative z-10 flex h-16 w-16 flex-none items-center justify-center rounded-2xl border border-brand-500/25 bg-ink-900 text-brand-400 shadow-[0_0_25px_rgba(226,22,48,0.2)]">
-                  <step.icon size={24} />
-                  <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">
-                    {i + 1}
-                  </span>
-                </div>
-                <h3 className="font-display mt-5 text-lg font-semibold text-white">
+      {/* El revelado envuelve al rail completo y no a cada paso: los pasos que
+          quedan fuera del recorte horizontal nunca llegarían a activarlo. */}
+      <Reveal delay={80} className="mt-14 sm:mt-20">
+        <div className="rail-scroller overflow-x-auto pb-4">
+          <ol className="rail-start flex w-max snap-x snap-mandatory gap-8 pr-5 sm:gap-12 sm:pr-8">
+            {steps.map((step, i) => (
+              <li
+                key={step.title}
+                className="w-[74vw] max-w-[19rem] flex-none snap-start sm:w-[17rem]"
+              >
+                <span
+                  aria-hidden
+                  className="numero-contorno font-display block text-display font-bold"
+                >
+                  {i + 1}
+                </span>
+                <step.icon
+                  size={20}
+                  className="mt-3 text-accent-400"
+                  aria-hidden
+                />
+                <h3 className="font-display mt-4 text-titulo-card font-semibold text-white">
                   {step.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-neutral-400">
+                <p className="mt-2.5 text-sm leading-relaxed text-fg-muted">
                   {step.description}
                 </p>
-              </div>
-            </ScrollReveal>
-          ))}
+              </li>
+            ))}
+          </ol>
         </div>
+      </Reveal>
+
+      {/* Prueba de método, no de resultados: mientras no existan casos reales
+          que publicar, lo verificable es cómo se trabaja. Se dice de forma
+          explícita en vez de rellenar el hueco con clientes inventados. */}
+      <div className="mx-auto mt-12 max-w-6xl px-5 sm:mt-16 sm:px-8">
+        <p className="max-w-xl text-sm leading-relaxed text-fg-muted">
+          Los casos de proyectos entregados llegan pronto. Mientras tanto, este
+          es el método con el que trabajamos en cada uno.
+        </p>
       </div>
     </section>
   );

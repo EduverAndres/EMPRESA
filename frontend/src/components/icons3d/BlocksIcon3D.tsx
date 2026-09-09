@@ -71,27 +71,27 @@ export default function BlocksIcon3D({
           y={edge * 0.55}
           z={0}
           edge={edge}
-          front="linear-gradient(135deg, rgba(120,10,22,0.9), rgba(40,3,8,0.95))"
-          top="linear-gradient(135deg, rgba(210,40,55,0.9), rgba(120,10,22,0.9))"
-          side="linear-gradient(135deg, rgba(70,6,14,0.9), rgba(20,2,4,0.95))"
+          front="linear-gradient(135deg, rgba(22,58,140,0.9), rgba(10,20,46,0.95))"
+          top="linear-gradient(135deg, rgba(50,116,235,0.9), rgba(22,58,140,0.9))"
+          side="linear-gradient(135deg, rgba(15,34,80,0.9), rgba(6,11,26,0.95))"
         />
         <MiniCube
           x={edge * 0.62}
           y={0}
           z={edge * 0.3}
           edge={edge}
-          front="linear-gradient(135deg, rgba(255,130,140,0.85), rgba(168,15,36,0.95))"
-          top="linear-gradient(135deg, rgba(255,200,205,0.9), rgba(255,60,78,0.8))"
-          side="linear-gradient(135deg, rgba(140,10,24,0.9), rgba(60,5,12,0.9))"
+          front="linear-gradient(135deg, rgba(125,190,252,0.85), rgba(31,84,200,0.95))"
+          top="linear-gradient(135deg, rgba(196,232,253,0.9), rgba(59,130,246,0.8))"
+          side="linear-gradient(135deg, rgba(25,68,164,0.9), rgba(13,29,68,0.9))"
         />
         <MiniCube
           x={edge * 0.62}
           y={edge * 0.95}
           z={edge * 0.7}
           edge={edge}
-          front="linear-gradient(135deg, rgba(255,60,78,0.9), rgba(150,10,25,0.9))"
-          top="linear-gradient(135deg, rgba(255,170,175,0.9), rgba(255,60,78,0.75))"
-          side="linear-gradient(135deg, rgba(100,8,18,0.9), rgba(40,3,8,0.9))"
+          front="linear-gradient(135deg, rgba(59,130,246,0.9), rgba(27,73,176,0.9))"
+          top="linear-gradient(135deg, rgba(165,214,253,0.9), rgba(59,130,246,0.75))"
+          side="linear-gradient(135deg, rgba(19,48,116,0.9), rgba(10,20,46,0.9))"
         />
       </div>
     </div>

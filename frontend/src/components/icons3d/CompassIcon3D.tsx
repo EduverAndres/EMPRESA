@@ -24,12 +24,12 @@ export default function CompassIcon3D({
         }}
       >
         <div
-          className="relative rounded-full border-2 border-white/20 shadow-[0_0_30px_rgba(255,60,78,0.35)]"
+          className="relative rounded-full border-2 border-white/20 shadow-[0_0_30px_rgba(59,130,246,0.35)]"
           style={{
             width: size,
             height: size,
             background:
-              "radial-gradient(circle at 35% 35%, rgba(255,150,158,0.35), rgba(60,5,12,0.85) 70%)",
+              "radial-gradient(circle at 35% 35%, rgba(147,197,253,0.35), rgba(13,29,68,0.85) 70%)",
           }}
         >
           {ticks.map((deg) => (
@@ -57,8 +57,8 @@ export default function CompassIcon3D({
                   height: 0,
                   borderLeft: `${needleW / 2}px solid transparent`,
                   borderRight: `${needleW / 2}px solid transparent`,
-                  borderBottom: `${needleH}px solid rgba(255,80,95,0.95)`,
-                  filter: "drop-shadow(0 0 6px rgba(255,80,95,0.7))",
+                  borderBottom: `${needleH}px solid rgba(82,150,252,0.95)`,
+                  filter: "drop-shadow(0 0 6px rgba(82,150,252,0.7))",
                 }}
               />
               <div

@@ -2,29 +2,73 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Loader2, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  Send,
+  CheckCircle2,
+  AlertCircle,
+  MessageCircle,
+} from "lucide-react";
+import { siteConfig } from "@/lib/site-config";
 
 type Status = "idle" | "loading" | "success" | "error";
+type Field = "name" | "phone" | "email" | "message";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const fieldClass =
+  "w-full rounded-xl border bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-fg-subtle outline-none transition-colors focus:bg-white/[0.05]";
+
+function validate(values: Record<Field, string>) {
+  const errors: Partial<Record<Field, string>> = {};
+
+  if (!values.name.trim()) errors.name = "Dinos cómo te llamas.";
+  if (!values.phone.trim()) errors.phone = "Necesitamos un teléfono de contacto.";
+
+  if (!values.email.trim()) errors.email = "Necesitamos tu correo.";
+  else if (!EMAIL_RE.test(values.email.trim()))
+    errors.email = "Ese correo no parece válido.";
+
+  return errors;
+}
 
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStatus("loading");
-    setErrorMessage("");
 
     const form = e.currentTarget;
-    const data = Object.fromEntries(new FormData(form).entries());
+    const raw = Object.fromEntries(new FormData(form).entries());
+    const values = {
+      name: String(raw.name ?? ""),
+      phone: String(raw.phone ?? ""),
+      email: String(raw.email ?? ""),
+      message: String(raw.message ?? ""),
+    };
+
+    // Validación en el cliente antes de gastar una petición al servidor.
+    const found = validate(values);
+    if (Object.keys(found).length > 0) {
+      setErrors(found);
+      setStatus("idle");
+      form.querySelector<HTMLElement>(`[name="${Object.keys(found)[0]}"]`)?.focus();
+      return;
+    }
+
+    setErrors({});
+    setStatus("loading");
+    setErrorMessage("");
 
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...values, company: raw.company ?? "" }),
       });
-      const result = await res.json();
+      const result = await res.json().catch(() => ({}));
 
       if (!res.ok) {
         setStatus("error");
@@ -40,101 +84,172 @@ export default function ContactForm() {
     }
   };
 
+  /** Limpia el error de un campo en cuanto el visitante lo corrige. */
+  const clearError = (field: Field) => {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
   if (status === "success") {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-2xl border border-brand-500/25 bg-brand-500/5 px-6 py-10 text-center">
-        <CheckCircle2 className="text-brand-400" size={32} />
+      <div
+        className="flex flex-col items-center gap-3 px-2 py-12 text-center"
+        role="status"
+      >
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-success-500/15 text-success-400">
+          <CheckCircle2 size={28} />
+        </span>
         <p className="font-display text-lg font-semibold text-white">
           ¡Mensaje enviado!
         </p>
-        <p className="max-w-sm text-sm text-neutral-400">
-          Gracias por escribirnos. Te responderemos pronto al correo o
-          teléfono que dejaste.
+        <p className="max-w-sm text-sm leading-relaxed text-fg-muted">
+          Gracias por escribirnos. Te responderemos pronto al correo o teléfono
+          que dejaste.
         </p>
+        <button
+          type="button"
+          onClick={() => setStatus("idle")}
+          className="mt-2 text-sm font-medium text-accent-400 transition-colors hover:text-accent-300"
+        >
+          Enviar otro mensaje
+        </button>
       </div>
     );
   }
 
+  const inputTone = (field: Field) =>
+    errors[field]
+      ? "border-red-500/60 focus:border-red-500"
+      : "border-[var(--color-line)] focus:border-brand-500/60";
+
   return (
-    <form onSubmit={handleSubmit} className="text-left">
-      {/* Honeypot field — hidden from real users, catches simple bots */}
+    <form onSubmit={handleSubmit} noValidate className="text-left">
+      {/* Trampa para bots: una persona nunca ve ni rellena este campo. */}
       <input
         type="text"
         name="company"
         tabIndex={-1}
         autoComplete="off"
-        className="absolute left-[-9999px] h-0 w-0 opacity-0"
         aria-hidden="true"
+        className="pointer-events-none absolute left-[-9999px] h-0 w-0 opacity-0"
       />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="name" className="text-xs font-medium text-neutral-400">
-            Nombre
+          <label htmlFor="name" className="text-sm font-medium text-fg-muted">
+            Nombre <span aria-hidden className="text-accent-400">*</span>
           </label>
           <input
             id="name"
             name="name"
             type="text"
-            required
+            autoComplete="name"
             placeholder="Tu nombre"
-            className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none transition-colors focus:border-brand-500/50"
+            aria-required="true"
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? "name-error" : undefined}
+            onChange={() => clearError("name")}
+            className={`${fieldClass} ${inputTone("name")}`}
           />
+          {errors.name && (
+            <p id="name-error" className="text-xs text-red-400">
+              {errors.name}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="phone" className="text-xs font-medium text-neutral-400">
-            Teléfono / WhatsApp
+          <label htmlFor="phone" className="text-sm font-medium text-fg-muted">
+            Teléfono / WhatsApp <span aria-hidden className="text-accent-400">*</span>
           </label>
           <input
             id="phone"
             name="phone"
             type="tel"
-            required
+            autoComplete="tel"
             placeholder="+57 300 000 0000"
-            className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none transition-colors focus:border-brand-500/50"
+            aria-required="true"
+            aria-invalid={!!errors.phone}
+            aria-describedby={errors.phone ? "phone-error" : undefined}
+            onChange={() => clearError("phone")}
+            className={`${fieldClass} ${inputTone("phone")}`}
           />
+          {errors.phone && (
+            <p id="phone-error" className="text-xs text-red-400">
+              {errors.phone}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label htmlFor="email" className="text-xs font-medium text-neutral-400">
-            Correo electrónico
+          <label htmlFor="email" className="text-sm font-medium text-fg-muted">
+            Correo electrónico <span aria-hidden className="text-accent-400">*</span>
           </label>
           <input
             id="email"
             name="email"
             type="email"
-            required
+            autoComplete="email"
             placeholder="tucorreo@ejemplo.com"
-            className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none transition-colors focus:border-brand-500/50"
+            aria-required="true"
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? "email-error" : undefined}
+            onChange={() => clearError("email")}
+            className={`${fieldClass} ${inputTone("email")}`}
           />
+          {errors.email && (
+            <p id="email-error" className="text-xs text-red-400">
+              {errors.email}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label htmlFor="message" className="text-xs font-medium text-neutral-400">
-            Cuéntanos sobre tu proyecto
+          <label htmlFor="message" className="text-sm font-medium text-fg-muted">
+            Cuéntanos sobre tu proyecto{" "}
+            <span className="text-fg-subtle">(opcional)</span>
           </label>
           <textarea
             id="message"
             name="message"
             rows={4}
             placeholder="¿Qué necesitas construir?"
-            className="resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-neutral-600 outline-none transition-colors focus:border-brand-500/50"
+            className={`${fieldClass} resize-none border-[var(--color-line)] focus:border-brand-500/60`}
           />
         </div>
       </div>
 
       {status === "error" && (
-        <div className="mt-4 flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm text-red-300">
-          <AlertCircle size={16} className="flex-none" />
-          {errorMessage}
+        <div
+          role="alert"
+          className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+        >
+          <p className="flex items-start gap-2">
+            <AlertCircle size={16} className="mt-0.5 flex-none" />
+            {errorMessage}
+          </p>
+          {/* Si el correo falla, el contacto no se pierde: se ofrece WhatsApp
+              en el mismo sitio en vez de dejar al visitante en un callejón. */}
+          <a
+            href={siteConfig.whatsapp.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-semibold text-white underline underline-offset-4 transition-colors hover:text-accent-300"
+          >
+            <MessageCircle size={13} />
+            Escríbenos por WhatsApp
+          </a>
         </div>
       )}
 
       <button
         type="submit"
         disabled={status === "loading"}
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-8 py-3.5 text-sm font-semibold text-white shadow-[0_0_30px_rgba(226,22,48,0.4)] transition-all hover:bg-brand-500 hover:shadow-[0_0_40px_rgba(226,22,48,0.6)] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-8 py-3.5 text-sm font-semibold text-white shadow-[0_8px_30px_-8px_rgba(37,99,235,0.8)] transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {status === "loading" ? (
           <>

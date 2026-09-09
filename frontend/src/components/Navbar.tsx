@@ -2,23 +2,59 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Wordmark from "./Wordmark";
+import LogoMark from "./LogoMark";
 import { siteConfig } from "@/lib/site-config";
+
+/** Ids de sección que el indicador de navegación puede marcar como activa. */
+const SECTION_IDS = ["inicio", "servicios", "contacto"];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState("inicio");
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    let ticking = false;
+
+    // El listener solo marca una bandera; la lectura del scroll (que fuerza
+    // al navegador a recalcular el layout) se hace una vez por frame.
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 12);
+        ticking = false;
+      });
+    };
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Resalta el enlace de la sección que ocupa la franja central de la pantalla.
+  useEffect(() => {
+    const sections = SECTION_IDS.map((id) => document.getElementById(id)).filter(
+      (el): el is HTMLElement => el !== null
+    );
+    if (sections.length === 0) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        }
+      },
+      { rootMargin: "-45% 0px -50% 0px" }
+    );
+
+    sections.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  // Bloquea el scroll del fondo mientras el menú móvil está abierto.
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -28,90 +64,108 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
         scrolled
-          ? "bg-ink-950/80 backdrop-blur-lg border-b border-white/10"
-          : "bg-transparent border-b border-transparent"
+          ? "border-b border-[var(--color-line)] bg-ink-950/85 backdrop-blur-xl"
+          : "border-b border-transparent bg-transparent"
       }`}
     >
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
-        <Link href="/#inicio" className="flex items-center gap-2.5 group">
-          <Image
-            src="/logo-mark.png"
-            alt={siteConfig.name}
-            width={32}
-            height={32}
-            priority
-            className="rounded-full transition-transform group-hover:scale-105"
+      <nav className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5 sm:px-8">
+        <Link
+          href="/#inicio"
+          className="group flex flex-none items-center gap-2.5"
+          aria-label={`${siteConfig.name} — inicio`}
+        >
+          <LogoMark
+            size={34}
+            uid="nav"
+            className="transition-transform duration-300 group-hover:scale-105"
           />
           <span className="flex flex-col leading-none">
             <Wordmark className="text-lg" />
-            <span className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-500 sm:block">
+            <span className="hidden text-[10px] font-medium uppercase tracking-[0.22em] text-fg-subtle sm:block">
               {siteConfig.tagline}
             </span>
           </span>
         </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
-          {siteConfig.nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-sm font-medium text-neutral-300 transition-colors hover:text-white"
-            >
-              {item.label}
-            </Link>
-          ))}
+        <div className="hidden items-center gap-1 md:flex">
+          {siteConfig.nav.map((item) => {
+            const id = item.href.split("#")[1];
+            const isActive = active === id;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                className={`relative rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
+                  isActive
+                    ? "text-white"
+                    : "text-fg-muted hover:text-white"
+                }`}
+              >
+                {item.label}
+                <span
+                  className={`absolute inset-x-3.5 -bottom-0.5 h-px origin-center bg-gradient-to-r from-transparent via-accent-400 to-transparent transition-transform duration-300 ${
+                    isActive ? "scale-x-100" : "scale-x-0"
+                  }`}
+                />
+              </Link>
+            );
+          })}
         </div>
 
-        <Link
-          href="/#contacto"
-          className="hidden rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(226,22,48,0.35)] transition-all hover:bg-brand-500 hover:shadow-[0_0_28px_rgba(226,22,48,0.55)] md:inline-block"
-        >
-          Hablemos
-        </Link>
+        <div className="flex flex-none items-center gap-2">
+          <Link
+            href="/#contacto"
+            className="hidden rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_4px_20px_-4px_rgba(37,99,235,0.6)] transition-colors hover:bg-brand-500 md:inline-block"
+          >
+            Hablemos
+          </Link>
 
-        <button
-          type="button"
-          aria-label={open ? "Cerrar menú" : "Abrir menú"}
-          onClick={() => setOpen((v) => !v)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 text-white md:hidden"
-        >
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
+          <button
+            type="button"
+            aria-label={open ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--color-line)] text-white transition-colors hover:bg-white/5 md:hidden"
+          >
+            {open ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </nav>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="overflow-hidden border-b border-white/10 bg-ink-950/95 backdrop-blur-lg md:hidden"
-          >
-            <div className="flex flex-col gap-1 px-5 py-4">
-              {siteConfig.nav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg px-3 py-3 text-base font-medium text-neutral-200 transition-colors hover:bg-white/5 hover:text-white"
-                >
-                  {item.label}
-                </Link>
-              ))}
+      {/* Menú móvil: la altura se anima con grid-template-rows, que es
+          compositable, en vez de animar `height` con JavaScript. */}
+      <div
+        className={`grid overflow-hidden border-[var(--color-line)] bg-ink-950/95 backdrop-blur-xl transition-all duration-300 md:hidden ${
+          open
+            ? "grid-rows-[1fr] border-b opacity-100"
+            : "grid-rows-[0fr] border-b-0 opacity-0"
+        }`}
+      >
+        <div className="min-h-0">
+          <div className="flex flex-col gap-1 px-5 py-4">
+            {siteConfig.nav.map((item) => (
               <Link
-                href="/#contacto"
+                key={item.href}
+                href={item.href}
                 onClick={() => setOpen(false)}
-                className="mt-2 rounded-full bg-brand-600 px-5 py-3 text-center text-sm font-semibold text-white"
+                className="rounded-xl px-3 py-3 text-base font-medium text-fg-muted transition-colors hover:bg-white/5 hover:text-white"
               >
-                Hablemos
+                {item.label}
               </Link>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            ))}
+            <Link
+              href="/#contacto"
+              onClick={() => setOpen(false)}
+              className="mt-2 rounded-full bg-brand-600 px-5 py-3 text-center text-sm font-semibold text-white"
+            >
+              Hablemos
+            </Link>
+          </div>
+        </div>
+      </div>
     </header>
   );
 }
