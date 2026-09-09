@@ -32,7 +32,7 @@ export default function DatabaseIcon3D({
             height: h - cap,
             top: cap / 2,
             background:
-              "linear-gradient(to right, rgba(60,5,12,0.9) 0%, rgba(255,60,78,0.85) 22%, rgba(255,140,150,0.9) 50%, rgba(255,60,78,0.85) 78%, rgba(60,5,12,0.9) 100%)",
+              "linear-gradient(to right, rgba(13,29,68,0.9) 0%, rgba(59,130,246,0.85) 22%, rgba(137,197,253,0.9) 50%, rgba(59,130,246,0.85) 78%, rgba(13,29,68,0.9) 100%)",
             borderLeft: "1px solid rgba(255,255,255,0.15)",
             borderRight: "1px solid rgba(255,255,255,0.15)",
           }}
@@ -48,14 +48,14 @@ export default function DatabaseIcon3D({
         />
         {/* top cap (lit lid) */}
         <div
-          className="absolute rounded-[50%] shadow-[0_0_18px_rgba(255,70,85,0.55)]"
+          className="absolute rounded-[50%] shadow-[0_0_18px_rgba(70,140,250,0.55)]"
           style={{
             left: 0,
             width: w,
             height: cap,
             top: 0,
             background:
-              "linear-gradient(135deg, rgba(255,205,210,0.95), rgba(255,60,78,0.9))",
+              "linear-gradient(135deg, rgba(201,235,253,0.95), rgba(59,130,246,0.9))",
             border: "1px solid rgba(255,255,255,0.35)",
           }}
         />

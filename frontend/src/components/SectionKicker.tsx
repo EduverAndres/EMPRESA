@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+/** Etiqueta corta que antecede al título de cada sección. */
 export default function SectionKicker({
   children,
   tone = "brand",
@@ -11,8 +12,8 @@ export default function SectionKicker({
 }) {
   return (
     <p
-      className={`text-xs font-semibold uppercase tracking-[0.2em] ${
-        tone === "brand" ? "text-brand-400" : "text-neutral-500"
+      className={`text-xs font-semibold uppercase tracking-[0.22em] ${
+        tone === "brand" ? "text-accent-400" : "text-fg-subtle"
       } ${className}`}
     >
       {children}

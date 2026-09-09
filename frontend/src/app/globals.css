@@ -1,30 +1,68 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   NEXUS — sistema de diseño
+   Paleta de confianza para software B2B: base navy profunda, primario azul
+   (estabilidad, seguridad) y acento cian (tecnología, innovación).
+   ========================================================================== */
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
   --font-display: var(--font-space-grotesk);
 
-  --color-ink-950: #0d0d0d;
-  --color-ink-900: #1b1b1b;
-  --color-ink-800: #242424;
-  --color-panel: #1b1b1b;
-  --color-brand-400: #ff6b78;
-  --color-brand-500: #ff3245;
-  --color-brand-600: #d90429;
-  --color-brand-700: #8b0000;
-  --color-brand-900: #2b0509;
+  /* Base: navy muy oscuro en vez de negro puro — lee como ingeniería,
+     no como agencia creativa, y evita el contraste duro del #000. */
+  --color-ink-950: #060910;
+  --color-ink-900: #0a0f1c;
+  --color-ink-850: #0e1526;
+  --color-ink-800: #131c31;
+  --color-ink-700: #1b2740;
+
+  /* Primario — confianza */
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-900: #0f2557;
+
+  /* Acento — tecnología */
+  --color-accent-300: #67e8f9;
+  --color-accent-400: #22d3ee;
+  --color-accent-500: #06b6d4;
+
+  /* Validación */
+  --color-success-400: #34d399;
+  --color-success-500: #10b981;
+
+  /* Texto sobre fondo oscuro, con matiz frío para no ensuciar el navy */
+  --color-fg: #e8edf7;
+  --color-fg-muted: #9fb0c9;
+  --color-fg-subtle: #6b7c99;
+
+  /* Bordes */
+  --color-line: rgba(148, 176, 224, 0.12);
+  --color-line-strong: rgba(148, 176, 224, 0.22);
 }
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
 
 html {
   scroll-behavior: smooth;
+  /* Deja aire bajo el navbar fijo al saltar a un ancla */
+  scroll-padding-top: 5.5rem;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background: var(--color-ink-950);
-  color: #f2f1f3;
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  color: var(--color-fg);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
@@ -32,7 +70,13 @@ body {
   color: #ffffff;
 }
 
-/* Slim, on-brand scrollbar */
+/* Foco visible y consistente en todo el sitio (accesibilidad por teclado) */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent-400);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -40,56 +84,291 @@ body {
   background: var(--color-ink-950);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-brand-700);
+  background: var(--color-ink-700);
   border-radius: 999px;
   border: 2px solid var(--color-ink-950);
 }
-
-/* Subtle grid backdrop used behind hero / section transitions */
-.bg-grid {
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 44px 44px;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-700);
 }
 
-.bg-radial-fade {
-  -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, #000 40%, transparent 100%);
-  mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, #000 40%, transparent 100%);
+/* --------------------------------------------------------------------------
+   Superficies
+   Una sola escala de "vidrio" reutilizada en tarjetas, panel de chat y campos
+   de formulario, para que todo el sitio se lea como un mismo material.
+   -------------------------------------------------------------------------- */
+
+.surface {
+  background: linear-gradient(
+    180deg,
+    rgba(148, 176, 224, 0.055) 0%,
+    rgba(148, 176, 224, 0.02) 100%
+  );
+  border: 1px solid var(--color-line);
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.surface-solid {
+  background: var(--color-ink-900);
+  border: 1px solid var(--color-line);
 }
+
+/* --------------------------------------------------------------------------
+   Tipografía de marca
+   -------------------------------------------------------------------------- */
 
 .text-gradient-brand {
-  background: linear-gradient(90deg, #ffffff 0%, #ff8a94 55%, var(--color-brand-500) 100%);
+  background: linear-gradient(100deg, #ffffff 0%, #7dd3fc 45%, #3b82f6 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
+/* --------------------------------------------------------------------------
+   Fondo del sitio — rejilla técnica estática
+   Sin blobs animados ni partículas: el desenfoque de 120px sobre elementos de
+   30rem obliga al compositor a repintar en cada frame y es lo que más costaba
+   antes. Aquí la profundidad es un degradado fijo, coste cero por frame.
+   -------------------------------------------------------------------------- */
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(148, 176, 224, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 176, 224, 0.055) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.bg-grid-fade {
+  -webkit-mask-image: radial-gradient(
+    ellipse 75% 60% at 50% 0%,
+    #000 30%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 75% 60% at 50% 0%,
+    #000 30%,
+    transparent 100%
+  );
+}
+
+/* --------------------------------------------------------------------------
+   Revelado al hacer scroll
+   Estado inicial en CSS + una clase que añade un IntersectionObserver. Sustituye
+   a framer-motion: mismo efecto, sin JavaScript de animación en el cliente.
+   -------------------------------------------------------------------------- */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Entrada del hero: se dispara al montar, sin esperar al observer */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-rise {
+  opacity: 0;
+  animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--rise-delay, 0ms);
+}
+
+/* --------------------------------------------------------------------------
+   Tarjetas con foco de luz
+   El degradado sigue al cursor mediante variables CSS que el JS actualiza
+   dentro de un requestAnimationFrame — sin re-render de React por movimiento.
+   -------------------------------------------------------------------------- */
+
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    340px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgba(59, 130, 246, 0.13),
+    transparent 68%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Marquesina de capacidades
+   -------------------------------------------------------------------------- */
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 0.75rem;
+  will-change: transform;
+}
+
+@keyframes marquee-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@keyframes marquee-right {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee-left {
+  animation: marquee-left 42s linear infinite;
+}
+.animate-marquee-right {
+  animation: marquee-right 42s linear infinite;
+}
+
+.marquee-row:hover .animate-marquee-left,
+.marquee-row:hover .animate-marquee-right {
+  animation-play-state: paused;
+}
+
+.marquee-fade {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+/* --------------------------------------------------------------------------
+   Micro-animaciones puntuales
+   -------------------------------------------------------------------------- */
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.typing-dot {
+  animation: typing-dot 1.2s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------------
+   Animaciones de los iconos 3D
+   Solo transform y opacity, para que corran en el compositor. Los iconos que
+   las usan quedan además pausados por el navegador cuando salen de pantalla.
+   -------------------------------------------------------------------------- */
+
 @keyframes float-slow {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50% { transform: translate3d(0, -22px, 0) rotate(6deg); }
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -18px, 0) rotate(5deg);
+  }
 }
 
 @keyframes float-slower {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50% { transform: translate3d(0, 18px, 0) rotate(-8deg); }
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, 15px, 0) rotate(-6deg);
+  }
 }
 
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes compass-settle {
+  0%,
+  100% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
 }
 
 .animate-float-slow {
@@ -104,153 +383,33 @@ body {
 .animate-pulse-glow {
   animation: pulse-glow 4s ease-in-out infinite;
 }
-
-/* ---- Ambient site-wide backdrop: drifting grid, glows and scan beam ---- */
-.bg-grid-drift {
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 44px 44px;
-  animation: grid-drift 60s linear infinite;
-}
-
-@keyframes grid-drift {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 44px 44px, 44px 44px; }
-}
-
-@keyframes blob-a {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(60px, 70px, 0) scale(1.15); }
-}
-@keyframes blob-b {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(-70px, -40px, 0) scale(1.12); }
-}
-@keyframes blob-c {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(40px, -60px, 0) scale(1.2); }
-}
-
-.animate-blob-a { animation: blob-a 22s ease-in-out infinite; }
-.animate-blob-b { animation: blob-b 27s ease-in-out infinite; }
-.animate-blob-c { animation: blob-c 31s ease-in-out infinite; }
-
-.scan-beam {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 160px;
-  background: linear-gradient(to bottom, transparent, rgba(255, 50, 69, 0.07), transparent);
-  animation: scan-move 13s linear infinite;
-}
-
-@keyframes scan-move {
-  0% { transform: translateY(-160px); }
-  100% { transform: translateY(160vh); }
-}
-
-/* Circuit-board traces with a flowing "current" dash animation */
-.circuit-line {
-  fill: none;
-  stroke: rgba(255, 60, 78, 0.4);
-  stroke-width: 1.4;
-  stroke-dasharray: 7 11;
-  animation: circuit-flow 6s linear infinite;
-}
-.circuit-line--slow {
-  animation-duration: 9s;
-  stroke: rgba(255, 60, 78, 0.28);
-}
-.circuit-node {
-  fill: rgba(255, 90, 105, 0.85);
-  animation: pulse-glow 3.2s ease-in-out infinite;
-}
-
-@keyframes circuit-flow {
-  to { stroke-dashoffset: -180; }
-}
-
-/* Particles drifting upward like data points */
-.particle {
-  position: absolute;
-  bottom: -5%;
-  border-radius: 9999px;
-  background: rgba(255, 70, 85, 0.7);
-  box-shadow: 0 0 8px rgba(255, 60, 78, 0.7);
-  animation-name: particle-float;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-
-@keyframes particle-float {
-  0% { transform: translateY(0) scale(1); opacity: 0; }
-  12% { opacity: 0.9; }
-  85% { opacity: 0.35; }
-  100% { transform: translateY(-115vh) scale(0.5); opacity: 0; }
-}
-
-/* Compass needle settling side to side, like it's finding its heading */
-@keyframes compass-settle {
-  0%, 100% { transform: rotate(-10deg); }
-  50% { transform: rotate(10deg); }
-}
 .animate-compass-settle {
   animation: compass-settle 4.5s ease-in-out infinite;
 }
 
-/* Tech-stack marquee rows, scrolling in opposite directions */
-.marquee-track {
-  display: flex;
-  width: max-content;
-  gap: 0.75rem;
-}
-
-@keyframes marquee-left {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-@keyframes marquee-right {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
-}
-
-.animate-marquee-left {
-  animation: marquee-left 34s linear infinite;
-}
-.animate-marquee-right {
-  animation: marquee-right 34s linear infinite;
-}
-
-.marquee-row:hover .animate-marquee-left,
-.marquee-row:hover .animate-marquee-right {
-  animation-play-state: paused;
-}
-
-.marquee-fade {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-}
+/* --------------------------------------------------------------------------
+   Accesibilidad: respetar la preferencia de menos movimiento
+   -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  .animate-float-slow,
-  .animate-float-slower,
-  .animate-spin-slow,
-  .animate-pulse-glow,
-  .bg-grid-drift,
-  .animate-blob-a,
-  .animate-blob-b,
-  .animate-blob-c,
-  .scan-beam,
-  .circuit-line,
-  .circuit-node,
-  .particle,
-  .animate-compass-settle,
-  .animate-marquee-left,
-  .animate-marquee-right {
-    animation: none;
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .animate-rise {
+    opacity: 1;
   }
 }

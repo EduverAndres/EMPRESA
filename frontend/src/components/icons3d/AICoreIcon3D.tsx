@@ -17,8 +17,8 @@ export default function AICoreIcon3D({
           width: size * 0.36,
           height: size * 0.36,
           background:
-            "radial-gradient(circle at 35% 35%, rgba(255,210,215,0.95), rgba(255,60,78,0.9) 55%, rgba(120,10,22,0.9) 100%)",
-          boxShadow: `0 0 ${size * 0.35}px rgba(255,60,78,0.55)`,
+            "radial-gradient(circle at 35% 35%, rgba(206,238,253,0.95), rgba(59,130,246,0.9) 55%, rgba(22,58,140,0.9) 100%)",
+          boxShadow: `0 0 ${size * 0.35}px rgba(59,130,246,0.55)`,
         }}
       />
 
@@ -56,7 +56,7 @@ export default function AICoreIcon3D({
           style={{ inset: 0, animationDuration: "11s", animationDirection: "reverse" }}
         >
           <span
-            className="absolute rounded-full bg-brand-400 shadow-[0_0_8px_rgba(255,90,105,0.9)]"
+            className="absolute rounded-full bg-brand-400 shadow-[0_0_8px_rgba(96,165,250,0.9)]"
             style={{ width: size * 0.06, height: size * 0.06, top: -size * 0.03, left: "50%", transform: "translateX(-50%)" }}
           />
         </div>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Favicon: misma esfera de puntos que la marca, con puntos más grandes.
+       A 16 px la trama fina del logo se convierte en una mancha gris. -->
+  <defs>
+    <radialGradient id="s" cx="34%" cy="30%" r="78%">
+      <stop offset="0%" stop-color="#a5f3fc"/>
+      <stop offset="26%" stop-color="#22d3ee"/>
+      <stop offset="55%" stop-color="#3b82f6"/>
+      <stop offset="82%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#0b1a3d"/>
+    </radialGradient>
+    <radialGradient id="r" cx="50%" cy="50%" r="50%">
+      <stop offset="52%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.7"/>
+    </radialGradient>
+    <pattern id="d" width="8.6" height="8.6" patternUnits="userSpaceOnUse">
+      <circle cx="4.3" cy="4.3" r="3" fill="#fff"/>
+    </pattern>
+    <mask id="m">
+      <circle cx="32" cy="32" r="30" fill="url(#d)"/>
+    </mask>
+  </defs>
+
+  <rect width="64" height="64" rx="14" fill="#060910"/>
+  <g mask="url(#m)">
+    <circle cx="32" cy="32" r="30" fill="url(#s)"/>
+    <circle cx="32" cy="32" r="30" fill="url(#r)"/>
+  </g>
+</svg>

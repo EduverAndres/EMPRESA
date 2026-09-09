@@ -1,58 +1,89 @@
-import { Mail, MessageCircle } from "lucide-react";
-import ScrollReveal from "./ScrollReveal";
+import { Mail, MessageCircle, Clock, Lock } from "lucide-react";
+import Reveal from "./Reveal";
 import SectionKicker from "./SectionKicker";
 import ContactForm from "./ContactForm";
 import { siteConfig } from "@/lib/site-config";
 
 export default function CTA() {
   return (
-    <section id="contacto" className="relative px-5 py-24 sm:px-8 sm:py-32">
-      <ScrollReveal className="mx-auto max-w-4xl">
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-brand-900/40 via-ink-900 to-ink-900 px-6 py-14 text-center sm:px-12 sm:py-20">
-          <div className="pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-brand-600/25 blur-[90px]" />
-          <div className="pointer-events-none absolute -right-10 -bottom-10 h-56 w-56 rounded-full bg-brand-600/20 blur-[90px]" />
+    <section id="contacto" className="relative px-5 py-20 sm:px-8 sm:py-28">
+      <Reveal className="mx-auto max-w-6xl">
+        <div className="surface relative overflow-hidden rounded-3xl">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 80% at 0% 0%, rgba(37,99,235,0.18), transparent 60%)",
+            }}
+          />
 
-          <SectionKicker className="relative mb-3">Hablemos</SectionKicker>
-          <h2 className="relative font-display mx-auto max-w-xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-            ¿Tienes un proyecto en mente?
-          </h2>
-          <p className="relative mx-auto mt-4 max-w-lg text-neutral-300">
-            Cada proyecto recibe atención cercana y dedicada, de principio a
-            fin. Cuéntanos tu idea y hablemos de cómo hacerla realidad.
-          </p>
+          {/* Dos columnas: a la izquierda a quién escribes y por qué confiar,
+              a la derecha la acción. Antes todo iba centrado en una sola
+              columna y el formulario quedaba muy por debajo del pliegue. */}
+          <div className="relative grid gap-10 p-6 sm:p-10 lg:grid-cols-[0.85fr_1fr] lg:gap-14 lg:p-14">
+            <div className="flex flex-col">
+              <SectionKicker className="mb-4">Hablemos</SectionKicker>
+              <h2 className="font-display text-[1.75rem] font-semibold leading-tight tracking-tight text-white sm:text-4xl">
+                ¿Tienes un proyecto en mente?
+              </h2>
+              <p className="mt-4 leading-relaxed text-fg-muted">
+                Cada proyecto recibe atención cercana y dedicada, de principio a
+                fin. Cuéntanos tu idea y hablemos de cómo hacerla realidad.
+              </p>
 
-          <div className="relative mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a
-              href={siteConfig.whatsapp.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-8 py-3.5 text-sm font-semibold text-white shadow-[0_0_30px_rgba(226,22,48,0.4)] transition-all hover:bg-brand-500 hover:shadow-[0_0_40px_rgba(226,22,48,0.6)] sm:w-auto"
-            >
-              <MessageCircle size={16} />
-              Escríbenos por WhatsApp
-            </a>
-            <a
-              href={`mailto:${siteConfig.email}`}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 px-8 py-3.5 text-sm font-semibold text-white/90 transition-colors hover:border-white/30 hover:bg-white/5 sm:w-auto"
-            >
-              <Mail size={16} />
-              {siteConfig.email}
-            </a>
-          </div>
+              <div className="mt-8 flex flex-col gap-3">
+                <a
+                  href={siteConfig.whatsapp.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group surface flex items-center gap-3 rounded-xl px-4 py-3.5 transition-colors hover:border-brand-500/40"
+                >
+                  <span className="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-brand-600/15 text-accent-400">
+                    <MessageCircle size={17} />
+                  </span>
+                  <span className="flex flex-col text-left">
+                    <span className="text-xs text-fg-subtle">WhatsApp</span>
+                    <span className="text-sm font-medium text-white">
+                      {siteConfig.whatsapp.display}
+                    </span>
+                  </span>
+                </a>
 
-          <div className="relative my-10 flex items-center gap-4">
-            <div className="h-px flex-1 bg-white/10" />
-            <span className="text-xs font-medium uppercase tracking-widest text-neutral-500">
-              o déjanos tus datos
-            </span>
-            <div className="h-px flex-1 bg-white/10" />
-          </div>
+                <a
+                  href={`mailto:${siteConfig.email}`}
+                  className="group surface flex items-center gap-3 rounded-xl px-4 py-3.5 transition-colors hover:border-brand-500/40"
+                >
+                  <span className="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-brand-600/15 text-accent-400">
+                    <Mail size={17} />
+                  </span>
+                  <span className="flex min-w-0 flex-col text-left">
+                    <span className="text-xs text-fg-subtle">Correo</span>
+                    <span className="truncate text-sm font-medium text-white">
+                      {siteConfig.email}
+                    </span>
+                  </span>
+                </a>
+              </div>
 
-          <div className="relative rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-            <ContactForm />
+              <ul className="mt-8 flex flex-col gap-2.5 text-xs text-fg-subtle">
+                <li className="flex items-center gap-2">
+                  <Clock size={14} className="flex-none text-accent-400" />
+                  Te respondemos por el medio que prefieras.
+                </li>
+                <li className="flex items-center gap-2">
+                  <Lock size={14} className="flex-none text-accent-400" />
+                  Tus datos se usan solo para responderte. Nada más.
+                </li>
+              </ul>
+            </div>
+
+            <div className="surface-solid rounded-2xl p-5 sm:p-7">
+              <ContactForm />
+            </div>
           </div>
         </div>
-      </ScrollReveal>
+      </Reveal>
     </section>
   );
 }

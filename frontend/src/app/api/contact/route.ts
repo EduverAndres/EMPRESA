@@ -1,24 +1,39 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { renderContactEmail } from "@/lib/contact-email";
+import { rateLimit } from "@/lib/rate-limit";
 import { siteConfig } from "@/lib/site-config";
 
-// Resend requiere el runtime de Node.js (no Edge).
+// Resend necesita el runtime de Node.js (no Edge).
 export const runtime = "nodejs";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_LEN = { name: 120, email: 200, phone: 40, message: 4000 };
 
 // Dirección remitente. IMPORTANTE:
-// "onboarding@resend.dev" es la dirección de PRUEBAS de Resend: solo permite
-// entregar correos a la dirección con la que se creó la cuenta de Resend.
-// Para enviar a CONTACT_TO_EMAIL (o a cualquier destinatario real) en
-// producción, hay que verificar un dominio propio en resend.com/domains y
-// usar una dirección de ese dominio aquí, por ejemplo:
-//   const FROM_EMAIL = `${siteConfig.name} <contacto@tudominio.com>`;
+// "onboarding@resend.dev" es la dirección de PRUEBAS de Resend: solo entrega
+// correos a la dirección con la que se creó la cuenta. Para escribir a
+// CONTACT_TO_EMAIL (o a cualquier otro destinatario) en producción hay que
+// verificar un dominio propio en resend.com/domains y usar una dirección de
+// ese dominio, por ejemplo: "NEXUS <contacto@tudominio.com>".
 const FROM_EMAIL =
-  process.env.CONTACT_FROM_EMAIL || `${siteConfig.name} <onboarding@resend.dev>`;
+  process.env.CONTACT_FROM_EMAIL?.trim() ||
+  `${siteConfig.name} <onboarding@resend.dev>`;
+
+/** Recorta y normaliza un campo del formulario. */
+function field(value: unknown, max: number) {
+  return String(value ?? "").trim().slice(0, max);
+}
 
 export async function POST(request: Request) {
+  const limit = rateLimit(request, { key: "contact", max: 5, windowMs: 300_000 });
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "Ya recibimos varios mensajes tuyos. Espera unos minutos antes de enviar otro." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfter) } }
+    );
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -26,16 +41,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Solicitud inválida." }, { status: 400 });
   }
 
-  const name = String(body.name ?? "").trim();
-  const email = String(body.email ?? "").trim();
-  const phone = String(body.phone ?? "").trim();
-  const message = String(body.message ?? "").trim();
-  // Honeypot: real users never fill this hidden field. Bots usually do.
-  const honeypot = String(body.company ?? "").trim();
+  const name = field(body.name, MAX_LEN.name);
+  const email = field(body.email, MAX_LEN.email);
+  const phone = field(body.phone, MAX_LEN.phone);
+  const message = field(body.message, MAX_LEN.message);
+  // Trampa para bots: una persona nunca ve este campo oculto.
+  const honeypot = field(body.company, 100);
 
-  if (honeypot) {
-    return NextResponse.json({ ok: true });
-  }
+  // Se responde "ok" a propósito: si el bot recibiera un error, reintentaría.
+  if (honeypot) return NextResponse.json({ ok: true });
 
   if (!name || !email || !phone) {
     return NextResponse.json(
@@ -48,14 +62,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "El correo no es válido." }, { status: 400 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const to = process.env.CONTACT_TO_EMAIL?.trim() || siteConfig.email;
+
   if (!apiKey) {
     console.error(
-      "[contact] RESEND_API_KEY no está configurada en las variables de entorno del servidor."
+      "[contact] Falta RESEND_API_KEY en las variables de entorno del servidor. Revisa /api/health."
     );
     return NextResponse.json(
-      { error: "El servicio de contacto no está disponible en este momento." },
-      { status: 500 }
+      {
+        error: `No pudimos enviar el mensaje. Escríbenos por WhatsApp al ${siteConfig.whatsapp.display} y te atendemos enseguida.`,
+      },
+      { status: 503 }
     );
   }
 
@@ -65,7 +83,8 @@ export async function POST(request: Request) {
     const resend = new Resend(apiKey);
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
-      to: process.env.CONTACT_TO_EMAIL || siteConfig.email,
+      to,
+      // Responder al correo recibido escribe directamente al visitante.
       replyTo: email,
       subject: `Nuevo contacto de ${name}`,
       html,
@@ -73,16 +92,25 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      // Log detallado: el mensaje de Resend suele decir exactamente qué
-      // falló (dominio no verificado, destinatario no permitido, etc).
+      // El mensaje de Resend suele decir exactamente qué falló: dominio sin
+      // verificar, destinatario no permitido en modo pruebas, clave inválida...
       console.error("[contact] Resend rechazó el envío:", {
         name: error.name,
         message: error.message,
         from: FROM_EMAIL,
-        to: process.env.CONTACT_TO_EMAIL || siteConfig.email,
+        to,
       });
+
+      if (/testing emails|verify a domain|own email address/i.test(error.message ?? "")) {
+        console.error(
+          `[contact] Resend está en modo pruebas: con el remitente "${FROM_EMAIL}" solo puede entregar a la dirección dueña de la cuenta. Verifica un dominio en https://resend.com/domains y define CONTACT_FROM_EMAIL para poder escribir a "${to}".`
+        );
+      }
+
       return NextResponse.json(
-        { error: "No se pudo enviar el mensaje. Intenta de nuevo." },
+        {
+          error: `No pudimos enviar el mensaje. Escríbenos por WhatsApp al ${siteConfig.whatsapp.display} y te atendemos enseguida.`,
+        },
         { status: 502 }
       );
     }
@@ -92,7 +120,9 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error("[contact] Error inesperado enviando el correo:", err);
     return NextResponse.json(
-      { error: "No se pudo enviar el mensaje. Intenta de nuevo." },
+      {
+        error: `No pudimos enviar el mensaje. Escríbenos por WhatsApp al ${siteConfig.whatsapp.display} y te atendemos enseguida.`,
+      },
       { status: 500 }
     );
   }

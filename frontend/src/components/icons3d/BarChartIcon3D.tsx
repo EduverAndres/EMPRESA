@@ -37,9 +37,9 @@ export default function BarChartIcon3D({
               width: barWidth,
               height: maxHeight * bar.h,
               background:
-                "linear-gradient(to top, rgba(120,10,22,0.9), rgba(255,70,85,0.95))",
-              borderTop: "3px solid rgba(255,205,210,0.9)",
-              boxShadow: "6px 6px 0 rgba(10,2,4,0.5)",
+                "linear-gradient(to top, rgba(22,58,140,0.9), rgba(70,140,250,0.95))",
+              borderTop: "3px solid rgba(201,235,253,0.9)",
+              boxShadow: "6px 6px 0 rgba(4,8,20,0.5)",
               animationDelay: `${bar.delay}s`,
             }}
           />

@@ -1,6 +1,6 @@
 import { Search, Layers, Repeat, LifeBuoy } from "lucide-react";
-import ScrollReveal from "./ScrollReveal";
-import SectionKicker from "./SectionKicker";
+import Reveal from "./Reveal";
+import SectionHeading from "./SectionHeading";
 
 const steps = [
   {
@@ -31,23 +31,26 @@ const steps = [
 
 export default function Process() {
   return (
-    <section className="relative px-5 py-24 sm:px-8 sm:py-32">
+    <section className="relative px-5 py-20 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-6xl">
-        <ScrollReveal className="mx-auto max-w-2xl text-center">
-          <SectionKicker className="mb-3">Cómo trabajamos</SectionKicker>
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-            Un proceso claro, de principio a fin
-          </h2>
-        </ScrollReveal>
+        <SectionHeading
+          kicker="Cómo trabajamos"
+          title="Un proceso claro, de principio a fin"
+          description="Cuatro etapas, sin sorpresas: en cada una sabes qué se está haciendo y qué sigue después."
+        />
 
-        <div className="relative mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="pointer-events-none absolute left-0 right-0 top-8 hidden h-px bg-gradient-to-r from-transparent via-white/15 to-transparent lg:block" />
+        <ol className="relative mt-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          {/* Hilo que une los cuatro pasos en escritorio */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-0 right-0 top-7 hidden h-px bg-gradient-to-r from-transparent via-brand-500/30 to-transparent lg:block"
+          />
 
           {steps.map((step, i) => (
-            <ScrollReveal key={step.title} delay={i * 0.08} className="relative">
-              <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
-                <div className="relative z-10 flex h-16 w-16 flex-none items-center justify-center rounded-2xl border border-brand-500/25 bg-ink-900 text-brand-400 shadow-[0_0_25px_rgba(226,22,48,0.2)]">
-                  <step.icon size={24} />
+            <Reveal key={step.title} as="li" delay={i * 90} className="relative">
+              <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+                <div className="surface-solid relative z-10 flex h-14 w-14 flex-none items-center justify-center rounded-2xl text-accent-400">
+                  <step.icon size={22} />
                   <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">
                     {i + 1}
                   </span>
@@ -55,13 +58,13 @@ export default function Process() {
                 <h3 className="font-display mt-5 text-lg font-semibold text-white">
                   {step.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-neutral-400">
+                <p className="mt-2 text-sm leading-relaxed text-fg-muted">
                   {step.description}
                 </p>
               </div>
-            </ScrollReveal>
+            </Reveal>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );
