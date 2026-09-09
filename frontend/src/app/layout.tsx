@@ -21,15 +21,15 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
+const pageTitle = `${siteConfig.fullName} — ${siteConfig.tagline}`;
+
 export const metadata: Metadata = {
-  // Sin `metadataBase`, los campos de metadata que usan rutas relativas —
-  // entre ellos la imagen que genera `opengraph-image.tsx` — no se pueden
-  // resolver a una URL absoluta, y WhatsApp, Facebook y X descartan cualquier
-  // og:image que no lo sea. Es la pieza que faltaba para que el enlace muestre
-  // previsualización al compartirlo.
+  // Sin `metadataBase` las URL de metadatos salen relativas, y WhatsApp,
+  // Facebook y X no resuelven rutas relativas: el enlace se compartiría sin
+  // ninguna previsualización. Es la pieza que faltaba.
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.fullName} — ${siteConfig.tagline}`,
+    default: pageTitle,
     template: `%s — ${siteConfig.fullName}`,
   },
   description: siteConfig.description,
@@ -53,20 +53,30 @@ export const metadata: Metadata = {
     locale: "es_CO",
     url: "/",
     siteName: siteConfig.fullName,
-    title: `${siteConfig.fullName} — ${siteConfig.tagline}`,
+    title: pageTitle,
     description: siteConfig.description,
-    // La imagen no se declara aquí a propósito: `app/opengraph-image.tsx`
-    // inyecta og:image junto con su tipo, ancho y alto de forma automática.
-    // Declararla a mano sobrescribiría esas etiquetas y perderíamos las
-    // dimensiones, que es justo lo que WhatsApp usa para decidir si muestra
-    // la tarjeta grande o solo un enlace de texto.
+    // `og:image` lo inyecta app/opengraph-image.tsx a partir de sus exports
+    // `alt`, `size` y `contentType`. Declararlo también aquí duplicaría la
+    // etiqueta y algunos lectores se quedan con la primera que encuentran.
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.fullName} — ${siteConfig.tagline}`,
+    title: pageTitle,
     description: siteConfig.description,
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      // Sin esto Google recorta la miniatura a un tamaño mínimo en resultados
+      // enriquecidos, aunque la imagen sea de 1200 px.
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export const viewport: Viewport = {
@@ -75,32 +85,30 @@ export const viewport: Viewport = {
 };
 
 /**
- * Datos estructurados de la empresa (schema.org).
+ * Datos estructurados del estudio.
  *
- * `ProfessionalService` es el tipo que corresponde a un estudio que presta
- * servicios profesionales, y es el que permite a Google mostrar el nombre, la
- * forma de contacto y el catálogo de servicios como entidad, en vez de tratar
- * la portada como una página suelta.
- *
- * Se genera desde `siteConfig` y `services` para que no haya una segunda copia
- * de los mismos datos que se quede desactualizada.
+ * `ProfessionalService` es el tipo de schema.org que corresponde a un negocio
+ * que presta servicios profesionales, y hereda de `LocalBusiness`, así que
+ * admite datos de contacto y catálogo. Va en el layout para que esté presente
+ * en la portada y en las siete páginas de servicio.
  */
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
-  "@id": `${siteConfig.url}/#organizacion`,
+  "@id": `${siteConfig.url}/#nexus`,
   name: siteConfig.fullName,
+  slogan: siteConfig.tagline,
   description: siteConfig.description,
   url: siteConfig.url,
   image: `${siteConfig.url}/opengraph-image`,
   logo: `${siteConfig.url}/icon.svg`,
   email: siteConfig.email,
-  // wa.me guarda el número ya normalizado, sin espacios ni signos.
-  telephone: `+${siteConfig.whatsapp.href.split("/").pop()}`,
+  telephone: siteConfig.whatsapp.display.replace(/\s+/g, ""),
   founder: { "@type": "Person", name: siteConfig.founder },
+  address: { "@type": "PostalAddress", addressCountry: "CO" },
   areaServed: { "@type": "Country", name: "Colombia" },
-  availableLanguage: ["es"],
-  // Las redes sin URL real valen "#": incluirlas dejaría un sameAs roto.
+  availableLanguage: "es",
+  // Solo las redes con URL real: un perfil apuntando a "#" ensucia el grafo.
   sameAs: Object.values(siteConfig.social).filter((url) => url && url !== "#"),
   hasOfferCatalog: {
     "@type": "OfferCatalog",
@@ -128,16 +136,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-ink-950">
-        {/* Salto directo al contenido para quien navega con teclado o lector de pantalla */}
-        <a
-          href="#inicio"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-brand-600 focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white"
-        >
-          Saltar al contenido
-        </a>
-
-        {/* Datos estructurados. Se escapa "<" según la recomendación de Next
-            para que ningún texto del catálogo pueda cerrar la etiqueta. */}
+        {/* El "<" se escapa a su equivalente unicode: JSON.stringify no lo
+            hace, y un "<" dentro del JSON cerraría el <script> antes de
+            tiempo si algún día un campo llegara a contener HTML. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -145,6 +146,13 @@ export default function RootLayout({
           }}
         />
 
+        {/* Salto directo al contenido para quien navega con teclado o lector de pantalla */}
+        <a
+          href="#inicio"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-brand-600 focus:px-5 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white"
+        >
+          Saltar al contenido
+        </a>
         <SiteBackground />
         <div className="relative z-10 flex min-h-full flex-col">{children}</div>
         <ChatWidget />

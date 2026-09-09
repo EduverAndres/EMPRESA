@@ -4,26 +4,36 @@ import SectionHeading from "./SectionHeading";
 import BrowserIcon3D from "./icons3d/BrowserIcon3D";
 import BarChartIcon3D from "./icons3d/BarChartIcon3D";
 
+/**
+ * Primera sección que rompe el centrado del hero.
+ *
+ * El encabezado se ancla a la izquierda y se queda pegado arriba mientras las
+ * dos disciplinas pasan por delante. Las tarjetas no están a la misma altura a
+ * propósito: el desfase vertical es lo que las separa, en lugar de un borde o
+ * una línea divisoria.
+ */
 export default function Pillars() {
   return (
-    <section className="relative px-5 py-20 sm:px-8 sm:py-28">
-      <div className="mx-auto max-w-6xl">
-        {/* Se retiró la píldora "Desarrollo de software & ciencia de datos" que
-            iba encima: repetía el mismo mensaje que la etiqueta y el título,
-            tres rótulos apilados diciendo lo mismo. */}
-        <SectionHeading
-          kicker="Lo que hacemos"
-          title="Dos disciplinas, un mismo equipo"
-          description="No separamos el desarrollo de software del análisis de datos — se combinan en cada proyecto que lo necesita."
-        />
+    <section className="relative px-5 pt-24 pb-16 sm:px-8 sm:pt-40 sm:pb-24">
+      <div className="mx-auto grid max-w-6xl gap-x-12 lg:grid-cols-12">
+        <div className="lg:col-span-5">
+          <div className="lg:sticky lg:top-32">
+            <SectionHeading
+              align="left"
+              kicker="Lo que hacemos"
+              title="Dos disciplinas, un mismo equipo"
+              description="No separamos el desarrollo de software del análisis de datos — se combinan en cada proyecto que lo necesita."
+            />
+          </div>
+        </div>
 
-        <div className="mt-14 grid gap-5 sm:mt-16 md:grid-cols-2">
+        <div className="mt-12 lg:col-span-6 lg:col-start-7 lg:mt-0">
           <Reveal delay={60}>
-            <SpotlightCard className="h-full">
+            <SpotlightCard>
               <div className="flex h-24 items-center justify-center">
                 <BrowserIcon3D size={104} />
               </div>
-              <h3 className="font-display mt-6 text-xl font-semibold text-white sm:text-2xl">
+              <h3 className="font-display mt-6 text-titulo-card font-semibold text-white">
                 Desarrollo de software
               </h3>
               <p className="mt-4 leading-relaxed text-fg-muted">
@@ -34,12 +44,14 @@ export default function Pillars() {
             </SpotlightCard>
           </Reveal>
 
-          <Reveal delay={140}>
-            <SpotlightCard className="h-full">
+          {/* El desfase sustituye al borde: dos bloques que no se alinean se
+              leen como dos cosas distintas sin dibujar la separación. */}
+          <Reveal delay={140} className="mt-8 lg:mt-24">
+            <SpotlightCard>
               <div className="flex h-24 items-center justify-center">
                 <BarChartIcon3D size={104} />
               </div>
-              <h3 className="font-display mt-6 text-xl font-semibold text-white sm:text-2xl">
+              <h3 className="font-display mt-6 text-titulo-card font-semibold text-white">
                 Ciencia de datos
               </h3>
               <p className="mt-4 leading-relaxed text-fg-muted">

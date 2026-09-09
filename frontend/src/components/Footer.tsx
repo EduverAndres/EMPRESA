@@ -19,7 +19,9 @@ export default function Footer() {
   return (
     <footer className="relative border-t border-[var(--color-line)] bg-ink-950/70">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
-        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+        {/* La última columna es más ancha que las de navegación: el correo
+            completo tiene que caber en una sola línea. */}
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.4fr]">
           <div>
             <Link href="/#inicio" className="flex items-center gap-2.5">
               <LogoMark size={32} uid="footer" />
@@ -64,6 +66,14 @@ export default function Footer() {
                   {item.label}
                 </Link>
               ))}
+              {/* Misión y visión ya no está en el menú principal; este es su
+                  único punto de entrada desde la navegación. */}
+              <Link
+                href="/nosotros"
+                className="text-sm text-fg-muted transition-colors hover:text-white"
+              >
+                Nosotros
+              </Link>
             </div>
           </nav>
 
@@ -92,7 +102,10 @@ export default function Footer() {
                 className="flex items-start gap-2 transition-colors hover:text-white"
               >
                 <Mail size={15} className="mt-0.5 flex-none text-accent-400" />
-                <span className="break-all">{siteConfig.email}</span>
+                {/* `break-all` partía la dirección por la mitad en cuanto la
+                    columna se quedaba corta. Con la columna ya ensanchada, el
+                    correo cabe entero y se fuerza a no romperse nunca. */}
+                <span className="whitespace-nowrap">{siteConfig.email}</span>
               </a>
               <a
                 href={siteConfig.whatsapp.href}

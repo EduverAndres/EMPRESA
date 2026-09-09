@@ -17,7 +17,7 @@ type Field = "name" | "phone" | "email" | "message";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const fieldClass =
-  "w-full rounded-xl border bg-white/[0.03] px-4 py-2.5 text-sm text-white placeholder:text-fg-subtle outline-none transition-colors";
+  "w-full rounded-xl border bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-fg-subtle outline-none transition-colors focus:bg-white/[0.05]";
 
 function validate(values: Record<Field, string>) {
   const errors: Partial<Record<Field, string>> = {};
@@ -138,10 +138,10 @@ export default function ContactForm() {
         className="pointer-events-none absolute left-[-9999px] h-0 w-0 opacity-0"
       />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="name" className="text-xs font-medium text-fg-muted">
-            Nombre <span className="text-accent-400">*</span>
+          <label htmlFor="name" className="text-sm font-medium text-fg-muted">
+            Nombre <span aria-hidden className="text-accent-400">*</span>
           </label>
           <input
             id="name"
@@ -149,6 +149,7 @@ export default function ContactForm() {
             type="text"
             autoComplete="name"
             placeholder="Tu nombre"
+            aria-required="true"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? "name-error" : undefined}
             onChange={() => clearError("name")}
@@ -162,8 +163,8 @@ export default function ContactForm() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="phone" className="text-xs font-medium text-fg-muted">
-            Teléfono / WhatsApp <span className="text-accent-400">*</span>
+          <label htmlFor="phone" className="text-sm font-medium text-fg-muted">
+            Teléfono / WhatsApp <span aria-hidden className="text-accent-400">*</span>
           </label>
           <input
             id="phone"
@@ -171,6 +172,7 @@ export default function ContactForm() {
             type="tel"
             autoComplete="tel"
             placeholder="+57 300 000 0000"
+            aria-required="true"
             aria-invalid={!!errors.phone}
             aria-describedby={errors.phone ? "phone-error" : undefined}
             onChange={() => clearError("phone")}
@@ -184,8 +186,8 @@ export default function ContactForm() {
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label htmlFor="email" className="text-xs font-medium text-fg-muted">
-            Correo electrónico <span className="text-accent-400">*</span>
+          <label htmlFor="email" className="text-sm font-medium text-fg-muted">
+            Correo electrónico <span aria-hidden className="text-accent-400">*</span>
           </label>
           <input
             id="email"
@@ -193,6 +195,7 @@ export default function ContactForm() {
             type="email"
             autoComplete="email"
             placeholder="tucorreo@ejemplo.com"
+            aria-required="true"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "email-error" : undefined}
             onChange={() => clearError("email")}
@@ -206,7 +209,7 @@ export default function ContactForm() {
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label htmlFor="message" className="text-xs font-medium text-fg-muted">
+          <label htmlFor="message" className="text-sm font-medium text-fg-muted">
             Cuéntanos sobre tu proyecto{" "}
             <span className="text-fg-subtle">(opcional)</span>
           </label>

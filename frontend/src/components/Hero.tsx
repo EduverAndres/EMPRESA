@@ -1,28 +1,51 @@
 import Link from "next/link";
-import { ArrowRight, ShieldCheck, Eye, Sparkles, Handshake } from "lucide-react";
+import { ArrowRight, LineChart, Wrench, LifeBuoy } from "lucide-react";
 import FloatingShapes from "./FloatingShapes";
+import AssistantButton from "./AssistantButton";
 import { siteConfig } from "@/lib/site-config";
 
-// Los cuatro valores que ya declaraba el sitio, ahora con jerarquía propia:
-// en una línea de texto plano se leían como decoración, no como compromiso.
-const values = [
-  { icon: ShieldCheck, label: "Calidad", detail: "Código revisado y probado" },
-  { icon: Eye, label: "Transparencia", detail: "Avances visibles siempre" },
-  { icon: Sparkles, label: "Innovación", detail: "La herramienta correcta" },
-  { icon: Handshake, label: "Compromiso", detail: "Acompañamiento real" },
+/**
+ * Franja bajo los botones.
+ *
+ * Sustituye a «Calidad · Transparencia · Innovación · Compromiso»: cuatro
+ * valores abstractos que cualquier estudio podría firmar y que no le dicen
+ * nada a quien está decidiendo si escribirnos. En su lugar van los tres
+ * diferenciadores declarados en `.claude/skills/nexus-marca/SKILL.md`.
+ *
+ * PENDIENTE: cuando existan los datos duros —años operando, proyectos
+ * entregados y tiempo de respuesta— sustituyen a estos tres bloques, con la
+ * cifra como `label` y la unidad como `detail`. Hasta entonces no se publica
+ * ninguna cifra: una inventada haría más daño que la ausencia.
+ */
+const proof = [
+  {
+    icon: LineChart,
+    label: "Datos e IA, no solo web",
+    detail: "Modelos, dashboards e integraciones de IA",
+  },
+  {
+    icon: Wrench,
+    label: "El stack lo elige el problema",
+    detail: "No forzamos la misma tecnología en todo",
+  },
+  {
+    icon: LifeBuoy,
+    label: "Seguimos después de entregar",
+    detail: "Soporte y ajustes con el producto en marcha",
+  },
 ];
 
 export default function Hero() {
   return (
     <section
       id="inicio"
-      className="relative flex min-h-[100svh] scroll-mt-0 items-center overflow-hidden pt-28 pb-16"
+      className="relative flex min-h-[100svh] scroll-mt-0 items-center overflow-hidden pt-28 pb-32 sm:pb-40"
     >
       <FloatingShapes />
 
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center px-5 text-center sm:px-8">
         <p
-          className="animate-rise inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-white/[0.03] px-4 py-1.5 text-xs font-medium text-brand-300 backdrop-blur-sm sm:text-sm"
+          className="animate-rise inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-white/[0.03] px-4 py-1.5 text-sm font-medium text-brand-300 backdrop-blur-sm"
           style={{ "--rise-delay": "0ms" } as React.CSSProperties}
         >
           <span className="relative flex h-1.5 w-1.5">
@@ -33,20 +56,20 @@ export default function Hero() {
         </p>
 
         <h1
-          className="animate-rise font-display mt-7 max-w-4xl text-[2.5rem] font-semibold leading-[1.08] tracking-tight text-white sm:text-6xl md:text-7xl"
+          className="animate-rise font-display mt-7 max-w-4xl text-display font-semibold text-white"
           style={{ "--rise-delay": "90ms" } as React.CSSProperties}
         >
-          Convertimos ideas y datos en{" "}
-          <span className="text-gradient-brand">software que despega</span>
+          Ese proyecto que llevas{" "}
+          <span className="text-gradient-brand">meses aplazando</span>
         </h1>
 
         <p
-          className="animate-rise mt-6 max-w-2xl text-balance text-base leading-relaxed text-fg-muted sm:text-lg"
+          className="animate-rise mt-7 max-w-2xl text-balance text-entrada text-fg-muted"
           style={{ "--rise-delay": "170ms" } as React.CSSProperties}
         >
-          Diseñamos software a medida y convertimos datos en decisiones — desde
-          plataformas web y aplicaciones móviles hasta modelos y dashboards que
-          sostienen tu negocio por dentro.
+          Ya sea una idea sin empezar, un Excel que se quedó corto o un sistema
+          que no se habla con los demás — lo construimos bien y te acompañamos
+          después.
         </p>
 
         <div
@@ -63,27 +86,21 @@ export default function Hero() {
               className="transition-transform duration-300 group-hover:translate-x-1"
             />
           </Link>
-          <Link
-            href="/#servicios"
-            className="inline-flex w-full items-center justify-center rounded-full border border-[var(--color-line-strong)] px-7 py-3.5 text-sm font-semibold text-white/90 transition-colors hover:border-brand-500/50 hover:bg-white/5 sm:w-auto"
-          >
-            Ver servicios
-          </Link>
+          <AssistantButton />
         </div>
 
-        {/* Franja de valores: sustituye a la lista de palabras sueltas anterior */}
         <ul
-          className="animate-rise mt-16 grid w-full max-w-3xl grid-cols-2 gap-x-6 gap-y-6 sm:mt-20 sm:grid-cols-4"
+          className="animate-rise mt-16 grid w-full max-w-3xl grid-cols-1 gap-x-8 gap-y-7 sm:mt-20 sm:grid-cols-3"
           style={{ "--rise-delay": "340ms" } as React.CSSProperties}
         >
-          {values.map((value) => (
-            <li key={value.label} className="flex flex-col items-center gap-2">
-              <value.icon size={18} className="text-accent-400" aria-hidden />
+          {proof.map((item) => (
+            <li key={item.label} className="flex flex-col items-center gap-2">
+              <item.icon size={18} className="text-accent-400" aria-hidden />
               <span className="text-sm font-semibold text-white">
-                {value.label}
+                {item.label}
               </span>
               <span className="text-sm leading-snug text-fg-muted">
-                {value.detail}
+                {item.detail}
               </span>
             </li>
           ))}

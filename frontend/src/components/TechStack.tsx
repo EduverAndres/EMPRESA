@@ -44,12 +44,15 @@ function Row({ items, direction }: { items: string[]; direction: "left" | "right
 
 export default function TechStack() {
   return (
-    <section className="relative py-20 sm:py-28">
+    // Única sección que recupera el centro, y en el nivel tipográfico más bajo
+    // de la página: después de la densidad de Services hace falta una zona de
+    // respiro antes del cierre. Sin párrafo de entrada, a propósito.
+    <section className="relative py-20">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <SectionHeading
+          size="apoyo"
           kicker="Capacidades"
           title="Elegimos la herramienta correcta, no la única que sabemos usar"
-          description="Evaluamos cada proyecto por su cuenta y elegimos el lenguaje, el framework y la infraestructura que mejor se ajusten a lo que necesita, en vez de aplicar siempre la misma receta."
         />
       </div>
 

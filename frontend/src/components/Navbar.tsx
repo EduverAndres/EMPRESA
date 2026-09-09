@@ -8,7 +8,7 @@ import LogoMark from "./LogoMark";
 import { siteConfig } from "@/lib/site-config";
 
 /** Ids de sección que el indicador de navegación puede marcar como activa. */
-const SECTION_IDS = ["inicio", "mision-vision", "servicios", "contacto"];
+const SECTION_IDS = ["inicio", "servicios", "contacto"];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);

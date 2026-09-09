@@ -12,7 +12,7 @@ export default function SectionKicker({
 }) {
   return (
     <p
-      className={`text-xs font-semibold uppercase tracking-[0.22em] ${
+      className={`text-kicker font-semibold uppercase ${
         tone === "brand" ? "text-accent-400" : "text-fg-subtle"
       } ${className}`}
     >

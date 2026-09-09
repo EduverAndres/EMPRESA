@@ -1,8 +1,6 @@
 import { Rocket, Telescope } from "lucide-react";
 import Reveal from "./Reveal";
 import SpotlightCard from "./SpotlightCard";
-import SectionHeading from "./SectionHeading";
-import { siteConfig } from "@/lib/site-config";
 
 const blocks = [
   {
@@ -17,34 +15,30 @@ const blocks = [
   },
 ];
 
+/**
+ * Misión y visión.
+ *
+ * Salió de la portada: en una home que ya tenía seis secciones competía por
+ * atención con el catálogo de servicios y con el cierre. Vive en `/nosotros`,
+ * donde el encabezado de la página hace de `h1` y este componente aporta solo
+ * los dos bloques.
+ */
 export default function MissionVision() {
   return (
-    <section id="mision-vision" className="relative px-5 py-20 sm:px-8 sm:py-28">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeading
-          kicker="Nuestro rumbo"
-          title="Un rumbo claro detrás de cada línea de código"
-          description={`En ${siteConfig.name} trabajamos con un propósito y una dirección definidos: construir software que genere valor real para quienes confían en nosotros.`}
-        />
-
-        <div className="mt-14 grid gap-5 sm:mt-16 md:grid-cols-2">
-          {blocks.map((block, i) => (
-            <Reveal key={block.title} delay={60 + i * 80}>
-              <SpotlightCard className="h-full">
-                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-brand-500/25 bg-brand-600/15 text-accent-400">
-                  <block.icon size={22} />
-                </div>
-                <h3 className="font-display text-xl font-semibold text-white sm:text-2xl">
-                  {block.title}
-                </h3>
-                <p className="mt-4 leading-relaxed text-fg-muted">
-                  {block.text}
-                </p>
-              </SpotlightCard>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
+    <div className="grid gap-5 md:grid-cols-2">
+      {blocks.map((block, i) => (
+        <Reveal key={block.title} delay={60 + i * 80}>
+          <SpotlightCard className="h-full">
+            <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-brand-500/25 bg-brand-600/15 text-accent-400">
+              <block.icon size={22} />
+            </div>
+            <h2 className="font-display text-titulo-card font-semibold text-white">
+              {block.title}
+            </h2>
+            <p className="mt-4 leading-relaxed text-fg-muted">{block.text}</p>
+          </SpotlightCard>
+        </Reveal>
+      ))}
+    </div>
   );
 }

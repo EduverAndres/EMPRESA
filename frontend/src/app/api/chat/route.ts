@@ -14,6 +14,17 @@ const MAX_HISTORY = 12;
 const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const UPSTREAM_TIMEOUT_MS = 25_000;
 
+// Respuestas de reserva cuando el modelo termina sin producir texto. Van
+// dentro del propio flujo y no como error HTTP: para cuando se sabe que no hay
+// texto, la respuesta ya se está transmitiendo y el código de estado ya se
+// envió.
+const SIN_TEXTO_BLOQUEADO =
+  "No puedo responder a eso. ¿Tienes alguna otra pregunta sobre nuestros servicios?";
+const SIN_TEXTO_VACIO =
+  "No tengo una respuesta clara para eso. ¿Puedes reformular tu pregunta?";
+const CORTE_INESPERADO =
+  "Se interrumpió la respuesta. Intenta de nuevo o escríbenos por WhatsApp.";
+
 export async function POST(request: Request) {
   // Sin límite, un script puede vaciar la cuota gratuita de Gemini en minutos.
   const limit = rateLimit(request, { key: "chat", max: 20, windowMs: 60_000 });
@@ -61,14 +72,20 @@ export async function POST(request: Request) {
     );
   }
 
-  // Corta la petición si el modelo tarda demasiado; sin esto la función se
-  // queda colgada hasta que Vercel la mata y el visitante no recibe nada.
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
+  // El tiempo límite cubre toda la transmisión, no solo la primera respuesta:
+  // si el modelo se queda a medias, el flujo se corta en vez de dejar al
+  // visitante mirando una respuesta que nunca termina.
+  const abortar = new AbortController();
+  const temporizador = setTimeout(() => abortar.abort(), UPSTREAM_TIMEOUT_MS);
 
+  let upstream: Response;
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
+    upstream = await fetch(
+      // `alt=sse` hace que Gemini emita eventos "data:" uno por fragmento. Sin
+      // este parámetro devuelve un array JSON gigante que solo se puede
+      // interpretar cuando ha llegado entero — justo lo contrario de lo que
+      // hace falta aquí.
+      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:streamGenerateContent?alt=sse`,
       {
         method: "POST",
         headers: {
@@ -85,60 +102,11 @@ export async function POST(request: Request) {
           })),
           generationConfig: { temperature: 0.6, maxOutputTokens: 400 },
         }),
-        signal: controller.signal,
+        signal: abortar.signal,
       }
     );
-
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok) {
-      const detalle = data?.error?.message ?? `HTTP ${res.status}`;
-      console.error("[chat] Gemini rechazó la petición:", res.status, detalle);
-
-      // Mensajes distintos según la causa: una clave inválida y una cuota
-      // agotada requieren acciones muy distintas de tu parte.
-      if (res.status === 400 && /API key not valid/i.test(detalle)) {
-        return NextResponse.json(
-          { error: "El asistente no está configurado correctamente. Escríbenos por WhatsApp." },
-          { status: 503 }
-        );
-      }
-      if (res.status === 429) {
-        return NextResponse.json(
-          { error: "El asistente está saturado en este momento. Intenta en unos minutos." },
-          { status: 429 }
-        );
-      }
-      if (res.status === 404) {
-        console.error(
-          `[chat] El modelo "${MODEL}" no existe o no está disponible para esta clave.`
-        );
-      }
-
-      return NextResponse.json(
-        { error: "No se pudo obtener respuesta. Intenta de nuevo." },
-        { status: 502 }
-      );
-    }
-
-    const candidate = data?.candidates?.[0];
-    const reply: string | undefined = candidate?.content?.parts
-      ?.map((p: { text?: string }) => p.text ?? "")
-      .join("")
-      .trim();
-
-    if (!reply) {
-      const blocked =
-        data?.promptFeedback?.blockReason || candidate?.finishReason === "SAFETY";
-      return NextResponse.json({
-        reply: blocked
-          ? "No puedo responder a eso. ¿Tienes alguna otra pregunta sobre nuestros servicios?"
-          : "No tengo una respuesta clara para eso. ¿Puedes reformular tu pregunta?",
-      });
-    }
-
-    return NextResponse.json({ reply });
   } catch (err) {
+    clearTimeout(temporizador);
     if (err instanceof DOMException && err.name === "AbortError") {
       console.error("[chat] Gemini no respondió dentro del tiempo límite.");
       return NextResponse.json(
@@ -151,7 +119,152 @@ export async function POST(request: Request) {
       { error: "No se pudo obtener respuesta. Intenta de nuevo." },
       { status: 500 }
     );
-  } finally {
-    clearTimeout(timeout);
   }
+
+  // Los errores se resuelven antes de empezar a transmitir: una vez enviado el
+  // primer byte del cuerpo ya no se puede cambiar el código de estado.
+  if (!upstream.ok) {
+    clearTimeout(temporizador);
+    const data = await upstream.json().catch(() => null);
+    const detalle = data?.error?.message ?? `HTTP ${upstream.status}`;
+    console.error("[chat] Gemini rechazó la petición:", upstream.status, detalle);
+
+    if (upstream.status === 400 && /API key not valid/i.test(detalle)) {
+      return NextResponse.json(
+        { error: "El asistente no está configurado correctamente. Escríbenos por WhatsApp." },
+        { status: 503 }
+      );
+    }
+    if (upstream.status === 429) {
+      return NextResponse.json(
+        { error: "El asistente está saturado en este momento. Intenta en unos minutos." },
+        { status: 429 }
+      );
+    }
+    if (upstream.status === 404) {
+      console.error(
+        `[chat] El modelo "${MODEL}" no existe o no está disponible para esta clave.`
+      );
+    }
+
+    return NextResponse.json(
+      { error: "No se pudo obtener respuesta. Intenta de nuevo." },
+      { status: 502 }
+    );
+  }
+
+  if (!upstream.body) {
+    clearTimeout(temporizador);
+    return NextResponse.json(
+      { error: "No se pudo obtener respuesta. Intenta de nuevo." },
+      { status: 502 }
+    );
+  }
+
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const reader = upstream.body!.getReader();
+      let pendiente = "";
+      let huboTexto = false;
+      let bloqueado = false;
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          // Gemini termina cada línea con CRLF, así que los eventos vienen
+          // separados por "\r\n\r\n". Se normaliza a "\n" antes de buscar el
+          // corte: si no, la búsqueda de "\n\n" no encuentra nada y no se
+          // llega a extraer una sola letra.
+          pendiente += decoder
+            .decode(value, { stream: true })
+            .replace(/\r\n/g, "\n");
+
+          // Los eventos SSE se separan por una línea en blanco. Un fragmento
+          // puede cortar un evento por la mitad, así que lo que quede sin
+          // cerrar se guarda para la siguiente vuelta.
+          let corte: number;
+          while ((corte = pendiente.indexOf("\n\n")) !== -1) {
+            const evento = pendiente.slice(0, corte);
+            pendiente = pendiente.slice(corte + 2);
+
+            for (const linea of evento.split("\n")) {
+              if (!linea.startsWith("data:")) continue;
+              const carga = linea.slice(5).trim();
+              if (!carga || carga === "[DONE]") continue;
+
+              let json: unknown;
+              try {
+                json = JSON.parse(carga);
+              } catch {
+                continue;
+              }
+
+              const dato = json as {
+                promptFeedback?: { blockReason?: string };
+                candidates?: {
+                  finishReason?: string;
+                  content?: { parts?: { text?: string }[] };
+                }[];
+              };
+
+              if (dato.promptFeedback?.blockReason) bloqueado = true;
+              const candidato = dato.candidates?.[0];
+              if (candidato?.finishReason === "SAFETY") bloqueado = true;
+
+              const texto =
+                candidato?.content?.parts
+                  ?.map((p) => p.text ?? "")
+                  .join("") ?? "";
+
+              if (texto) {
+                huboTexto = true;
+                controller.enqueue(encoder.encode(texto));
+              }
+            }
+          }
+        }
+
+        // El modelo terminó sin emitir texto: filtro de seguridad o respuesta
+        // vacía. Se envía el mensaje de reserva por el mismo canal.
+        if (!huboTexto) {
+          controller.enqueue(
+            encoder.encode(bloqueado ? SIN_TEXTO_BLOQUEADO : SIN_TEXTO_VACIO)
+          );
+        }
+      } catch (err) {
+        console.error("[chat] La transmisión se interrumpió:", err);
+        // Si ya se envió texto no se añade nada: el visitante se queda con la
+        // parte que sí llegó, que es más útil que un aviso pegado al final.
+        if (!huboTexto) {
+          controller.enqueue(encoder.encode(CORTE_INESPERADO));
+        }
+      } finally {
+        clearTimeout(temporizador);
+        reader.releaseLock();
+        controller.close();
+      }
+    },
+
+    cancel() {
+      // El visitante cerró la pestaña o canceló: se corta también la petición
+      // a Gemini en vez de dejarla consumiendo cuota.
+      clearTimeout(temporizador);
+      abortar.abort();
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-store",
+      // Evita que un proxy intermedio acumule la respuesta y la entregue de
+      // golpe, que anularía el streaming.
+      "X-Accel-Buffering": "no",
+    },
+  });
 }

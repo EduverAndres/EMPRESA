@@ -84,7 +84,7 @@ export default function OpengraphImage() {
               maxWidth: 920,
             }}
           >
-            Convertimos ideas y datos en software que despega
+            Ese proyecto que llevas meses aplazando
           </div>
           <div
             style={{

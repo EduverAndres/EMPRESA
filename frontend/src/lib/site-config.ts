@@ -33,9 +33,10 @@ export const siteConfig = {
     linkedin: "#",
     facebook: "#",
   },
+  // Misión y visión salió del menú principal: vive en /nosotros y se enlaza
+  // desde el pie, para que el nav se quede solo con el recorrido de la home.
   nav: [
     { label: "Inicio", href: "/#inicio" },
-    { label: "Misión y visión", href: "/#mision-vision" },
     { label: "Servicios", href: "/#servicios" },
     { label: "Contacto", href: "/#contacto" },
   ],
